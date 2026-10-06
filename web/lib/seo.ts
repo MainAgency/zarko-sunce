@@ -7,8 +7,8 @@ export const SITE_URL =
 
 export const SITE_NAME = "Žarko Sunce";
 
-// TODO: fill in once the CMS has real copy for the home page.
-export const DEFAULT_DESCRIPTION = "";
+export const DEFAULT_DESCRIPTION =
+  "Adaptacije stanova, Knauf pregradni zidovi, gletanje i bojanje, spušteni stropovi i radovi po principu ključ u ruke. Besplatan izlazak na teren i jasna ponuda.";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || "http://localhost:3001";
 

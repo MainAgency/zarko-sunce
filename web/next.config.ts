@@ -46,7 +46,11 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 100],
     minimumCacheTTL: 60 * 60 * 24 * 30,
-    remotePatterns,
+    // Unsplash hosts the placeholder photos until real project photos land in the CMS.
+    remotePatterns: [
+      ...remotePatterns,
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+    ],
     unoptimized: process.env.NODE_ENV === "development" || bucketIsLocal,
   },
 
