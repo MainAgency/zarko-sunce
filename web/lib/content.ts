@@ -178,100 +178,177 @@ export const ABOUT = {
 
 /* --------------------------------------------------------- Projects/news */
 
-// TODO: every project, news item and blog post below is placeholder content
-// to show the layout. Replace with real entries (ideally CMS collections)
-// before the site goes live.
+// TODO: the news items and blog posts below are placeholder content to show
+// the layout. Replace with real entries (ideally CMS collections) before the
+// site goes live. The projects are real; area, duration and descriptions are
+// still to be filled in.
 
 export type Project = {
   slug: string;
   title: string;
   category: string;
-  area: string;
-  duration: string;
+  location?: string;
+  /** e.g. "U tijeku" for work still under way. */
+  status?: string;
+  area?: string;
+  duration?: string;
   services: ServiceId[];
   cover: Photo;
   gallery: Photo[];
+  /** Same view before and after the work, for the comparison slider. */
+  comparisons?: { before: Photo; after: Photo }[];
   summary: string;
   body: string[];
 };
 
+/** "Ugostiteljstvo · Split" — the short line under a project's title. */
+export const projectMeta = (p: Project) => [p.category, p.location ?? p.area].filter(Boolean).join(" · ");
+
+/**
+ * Attaches a project's photos from /public/images/projekti/<slug>/NN.webp, in
+ * the order given; the first is the cover. `pairs` are [before, after] photo
+ * numbers showing the same view, for the before/after slider.
+ */
+function withPhotos(
+  project: Omit<Project, "cover" | "gallery" | "comparisons">,
+  alt: string,
+  numbers: number[],
+  pairs: [number, number][] = [],
+): Project {
+  const src = (n: number) => `/images/projekti/${project.slug}/${String(n).padStart(2, "0")}.webp`;
+  const gallery = numbers.map((n, i) => ({ src: src(n), alt: `${alt}, fotografija ${i + 1}` }));
+  const comparisons = pairs.map(([b, a]) => ({
+    before: { src: src(b), alt: `${alt}, prije radova` },
+    after: { src: src(a), alt: `${alt}, nakon radova` },
+  }));
+  return { ...project, cover: gallery[0], gallery, comparisons };
+}
+
 export const PROJECTS: Project[] = [
-  {
-    slug: "adaptacija-dvosobnog-stana",
-    title: "Adaptacija dvosobnog stana",
-    category: "Ključ u ruke",
-    area: "62 m²",
-    duration: "6 tjedana",
-    services: ["kljuc-u-ruke", "adaptacije", "knauf", "gletanje", "stropovi"],
-    cover: PHOTOS.studio,
-    gallery: [PHOTOS.studio, PHOTOS.kitchenGrey, PHOTOS.bedroomLight],
-    summary: "Stariji stan prilagođen modernom životu: nova raspodjela prostora, spušteni strop i potpuno novi završni slojevi.",
-    body: [
-      "Stan je prije radova imao zatvorenu kuhinju i dugačak, mračan hodnik. Uklonili smo dio nenosivog zida i otvorili kuhinju prema dnevnom boravku.",
-      "U hodniku smo izveli spušteni strop s mjestima za rasvjetu, a novim Knauf zidom odvojili radni kutak od spavaće sobe.",
-      "Svi zidovi su sanirani, gletani u više slojeva i obojeni. Prostor je predan očišćen i spreman za useljenje.",
+  withPhotos(
+    {
+      slug: "soul-kitchen",
+      title: "Restoran Soul Kitchen",
+      category: "Ugostiteljstvo",
+      services: ["adaptacije"],
+      summary: "Uređenje restorana u kamenom prostoru s lukovima — od grubih radova do gotovog interijera.",
+      body: [],
+    },
+    "Restoran Soul Kitchen",
+    [8, 21, 16, 4, 1, 22, 26, 27, 6, 10, 11, 18, 2, 3, 5, 7, 9, 12, 13, 14, 15, 17, 19, 20, 23, 24, 25, 28, 29],
+    [
+      [17, 16],
+      [28, 4],
+      [19, 21],
+      [12, 18],
     ],
-  },
-  {
-    slug: "kuhinja-i-dnevni-boravak",
-    title: "Kuhinja i dnevni boravak",
-    category: "Adaptacija",
-    area: "38 m²",
-    duration: "3 tjedna",
-    services: ["adaptacije", "gletanje", "stropovi"],
-    cover: PHOTOS.kitchenIsland,
-    gallery: [PHOTOS.kitchenIsland, PHOTOS.livingTv],
-    summary: "Spajanje kuhinje i dnevnog boravka u jedan otvoren prostor s kaskadnim stropom iznad otoka.",
-    body: [
-      "Cilj je bio dobiti jedan otvoren prostor za kuhanje i druženje. Nakon rušenja pregradnog zida izravnali smo zidove i pripremili ih za nove instalacije.",
-      "Iznad kuhinjskog otoka izveden je kaskadni spušteni strop s LED trakom, a zidovi su gletani i obojeni u svijetle, tople tonove.",
-    ],
-  },
-  {
-    slug: "spavaca-soba-s-tv-zidom",
-    title: "Spavaća soba s TV zidom",
-    category: "Knauf",
-    area: "16 m²",
-    duration: "1 tjedan",
-    services: ["knauf", "gletanje"],
-    cover: PHOTOS.bedroomDark,
-    gallery: [PHOTOS.bedroomDark, PHOTOS.bedroomLight],
-    summary: "Knauf obloga s nišama i skrivenom rasvjetom te tamni zid koji smiruje cijelu sobu.",
-    body: [
-      "Na zidu iza kreveta izveli smo Knauf oblogu s nišama za rasvjetu i skrivenim kabelima.",
-      "Zidovi su gletani do potpuno glatke površine i obojeni, s naglašenim tamnim zidom iza uzglavlja.",
-    ],
-  },
-  {
-    slug: "uredski-prostor",
-    title: "Uređenje uredskog prostora",
-    category: "Poslovni prostor",
-    area: "120 m²",
-    duration: "5 tjedana",
-    services: ["knauf", "stropovi", "gletanje"],
-    cover: PHOTOS.officeHall,
-    gallery: [PHOTOS.officeHall, PHOTOS.homeOffice],
-    summary: "Pregradni zidovi za nove urede, spušteni stropovi s revizijskim otvorima i bojanje cijelog prostora.",
-    body: [
-      "Otvoreni prostor podijelili smo Knauf pregradnim zidovima sa zvučnom izolacijom kako bi svaki ured imao svoj mir.",
-      "U hodnicima su izvedeni spušteni stropovi s revizijskim otvorima za lakši pristup instalacijama.",
-    ],
-  },
-  {
-    slug: "kupaonica-i-hodnik",
-    title: "Kupaonica i hodnik",
-    category: "Adaptacija",
-    area: "14 m²",
-    duration: "2 tjedna",
-    services: ["adaptacije", "stropovi"],
-    cover: PHOTOS.bathroom,
-    gallery: [PHOTOS.bathroom, PHOTOS.ceiling],
-    summary: "Spušteni strop u kupaonici i hodniku, nova rasvjeta i priprema zidova za završne radove.",
-    body: [
-      "U kupaonici smo izveli spušteni strop od vodootpornih ploča s ugradnom rasvjetom.",
-      "Hodnik je dobio novi strop s točkastom rasvjetom te gletane i obojene zidove.",
-    ],
-  },
+  ),
+  withPhotos(
+    {
+      slug: "ured-split",
+      title: "Renovacija ureda",
+      category: "Poslovni prostor",
+      location: "Split",
+      services: ["adaptacije"],
+      summary: "Renovacija uredskog prostora u Splitu — od pripreme zidova do gotovog ureda.",
+      body: [],
+    },
+    "Renovacija ureda u Splitu",
+    [7, 6, 5, 4, 1, 2, 3],
+    [[1, 7]],
+  ),
+  withPhotos(
+    {
+      slug: "dugopolje-poslovna-zgrada",
+      title: "Rekonstrukcija poslovne zgrade",
+      category: "Poslovni prostor",
+      location: "Dugopolje",
+      services: [],
+      summary: "Rekonstrukcija poslovne zgrade u Dugopolju.",
+      body: [],
+    },
+    "Rekonstrukcija poslovne zgrade u Dugopolju",
+    [1, 3, 7, 2, 4, 6, 5],
+  ),
+  withPhotos(
+    {
+      slug: "seget",
+      title: "Suhomontažni radovi uz more",
+      category: "Pregradni zidovi",
+      location: "Seget",
+      services: ["knauf"],
+      summary: "Suhomontažni pregradni zidovi i obloge u objektu uz more u Segetu.",
+      body: [],
+    },
+    "Suhomontažni radovi u Segetu",
+    [6, 8, 1, 3, 5, 2, 7],
+  ),
+  withPhotos(
+    {
+      slug: "stan-bacvice",
+      title: "Rekonstrukcija stana",
+      category: "Rekonstrukcija",
+      location: "Bačvice, Split",
+      services: ["knauf"],
+      summary: "Rekonstrukcija stana u starijoj zgradi na Bačvicama — radovi na podovima i novi pregradni zidovi.",
+      body: [],
+    },
+    "Rekonstrukcija stana na Bačvicama",
+    [1, 9, 12, 13, 2, 7, 8, 3, 4, 5, 6, 10, 11],
+  ),
+  withPhotos(
+    {
+      slug: "zgrada-znjan",
+      title: "Stambena zgrada, novogradnja",
+      category: "Novogradnja",
+      location: "Žnjan, Split",
+      services: ["knauf"],
+      summary: "Suhomontažni radovi u novoj stambenoj zgradi na Žnjanu.",
+      body: [],
+    },
+    "Novogradnja na Žnjanu",
+    [5, 4, 8, 10, 9, 7, 11, 1, 2, 3, 12, 13],
+  ),
+  withPhotos(
+    {
+      slug: "znjan-s-65",
+      title: "Stambena zgrada S-65",
+      category: "Novogradnja",
+      location: "Žnjan, Split",
+      services: ["knauf"],
+      summary: "Pregradni zidovi i obloge od gips-kartonskih ploča u stambenoj zgradi S-65 na Žnjanu.",
+      body: [],
+    },
+    "Stambena zgrada S-65 na Žnjanu",
+    [11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  ),
+  withPhotos(
+    {
+      slug: "sirobuja",
+      title: "Stambena zgrada, novogradnja",
+      category: "Novogradnja",
+      location: "Sirobuja, Split",
+      services: ["knauf"],
+      summary: "Gips-kartonske obloge u novoj stambenoj zgradi na Sirobuji.",
+      body: [],
+    },
+    "Novogradnja na Sirobuji",
+    [3, 4, 1, 2],
+  ),
+  withPhotos(
+    {
+      slug: "kafic-pazdigrad",
+      title: "Uređenje kafića",
+      category: "Ugostiteljstvo",
+      location: "Pazdigrad, Split",
+      status: "U tijeku",
+      services: ["knauf"],
+      summary: "Uređenje kafića u Pazdigradu: instalacije i suhomontažni zidovi. Radovi su u tijeku.",
+      body: [],
+    },
+    "Uređenje kafića u Pazdigradu",
+    [1, 4, 2, 3, 5, 6],
+  ),
 ];
 
 export type ArticleBlock = { type: "p" | "h2"; text: string };

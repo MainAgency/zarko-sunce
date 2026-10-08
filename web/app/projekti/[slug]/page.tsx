@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BeforeAfter } from "@/components/BeforeAfter";
 import { CtaRow } from "@/components/CtaRow";
 import { Frame } from "@/components/Frame";
-import { PROJECTS, SERVICES } from "@/lib/content";
+import { PROJECTS, SERVICES, projectMeta } from "@/lib/content";
 import { buildSeoMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -36,12 +37,15 @@ export default async function ProjectPage({ params }: Props) {
   const next = PROJECTS[(index + 1) % PROJECTS.length];
   const services = SERVICES.filter((s) => project.services.includes(s.id));
 
+  // Only the facts we actually have.
   const facts = [
     ["Kategorija", project.category],
+    ["Lokacija", project.location],
+    ["Status", project.status],
     ["Površina", project.area],
     ["Trajanje", project.duration],
     ["Usluge", services.map((s) => s.title).join(", ")],
-  ];
+  ].filter((fact): fact is [string, string] => Boolean(fact[1]));
 
   return (
     <>
@@ -54,7 +58,7 @@ export default async function ProjectPage({ params }: Props) {
           </p>
           <div className="lg:col-span-8 lg:col-start-5">
             <p data-reveal className="label text-muted">
-              Projekt 0{index + 1}
+              Projekt {String(index + 1).padStart(2, "0")}
             </p>
             <h1 data-reveal className="heading mt-6 text-[clamp(2rem,4vw,3.5rem)]">
               {project.title}
@@ -83,6 +87,31 @@ export default async function ProjectPage({ params }: Props) {
           </div>
         </div>
 
+        {/* Before/after sliders: one wide, or two to a row. */}
+        {project.comparisons && project.comparisons.length > 0 && (
+          <section aria-label="Prije i poslije" className="mt-24">
+            <div className="grid gap-4 lg:grid-cols-12">
+              <p data-reveal className="label dot text-muted lg:col-span-3 lg:pt-1">
+                Prije i poslije
+              </p>
+              <p data-reveal className="text-muted lg:col-span-8 lg:col-start-5">
+                Povucite crtu lijevo ili desno i usporedite prostor prije i nakon radova.
+              </p>
+            </div>
+            <div data-reveal className="mt-10 grid gap-6 sm:grid-cols-2">
+              {project.comparisons.map(({ before, after }, i, all) => (
+                <BeforeAfter
+                  key={before.src}
+                  before={before}
+                  after={after}
+                  width={all.length === 1 ? 2000 : 1200}
+                  className={all.length === 1 ? "aspect-square sm:col-span-2 sm:aspect-[16/10]" : "aspect-square"}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
         {project.gallery.length > 1 && (
           <div className="mt-20 grid gap-6 sm:grid-cols-2">
             {project.gallery.slice(1).map((photo, i) => (
@@ -99,7 +128,7 @@ export default async function ProjectPage({ params }: Props) {
             <span className="link pb-1">{next.title}</span> →
           </span>
           <span className="label mt-4 block text-muted">
-            {next.category} · {next.area}
+            {projectMeta(next)}
           </span>
         </span>
         <Frame

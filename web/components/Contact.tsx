@@ -1,137 +1,288 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent, type KeyboardEvent } from "react";
 
 import { CONTACT, SERVICES, type ServiceId } from "@/lib/content";
 
 type Status = { state: "idle" | "sending" | "sent" } | { state: "error"; message: string };
+type Kind = "person" | "business";
 
-const field =
-  "w-full border-b border-ink/20 bg-transparent py-3 text-[15px] outline-none transition-colors placeholder:text-muted focus:border-ink";
+const KINDS: [Kind, string][] = [
+  ["person", "Privatne osobe"],
+  ["business", "Tvrtke"],
+];
 
-/** The contact page form. `initialServices` comes from links like /kontakt?usluga=gletanje. */
+const BUDGETS = ["Do 10.000 €", "10.000 – 30.000 €", "30.000 – 60.000 €", "Više od 60.000 €"];
+const SPACES: Record<Kind, string[]> = {
+  person: ["Stan", "Kuća", "Vikendica / apartman", "Ostalo"],
+  business: ["Ured", "Trgovina / ugostiteljstvo", "Stambena zgrada", "Ostalo"],
+};
+const SIZES = ["Do 50 m²", "50 – 100 m²", "100 – 200 m²", "Više od 200 m²"];
+const STARTS = ["Što prije", "U sljedeća 3 mjeseca", "Kasnije"];
+const WORKS = SERVICES.map((s) => s.title);
+
+/** Staggered rise-in: `--d` is the item's place in the sequence. */
+const delay = (d: number) => ({ "--d": d }) as CSSProperties;
+
+function Select({ name, placeholder, options, value }: { name: string; placeholder: string; options: string[]; value?: string }) {
+  return (
+    <select
+      name={name}
+      aria-label={placeholder}
+      defaultValue={value && options.includes(value) ? value : ""}
+      className="cm-field"
+    >
+      <option value="" disabled>
+        {placeholder}
+      </option>
+      {options.map((o) => (
+        <option key={o}>{o}</option>
+      ))}
+    </select>
+  );
+}
+
+/**
+ * The contact page. On desktop it is a single screen: the title runs as a
+ * vertical marquee down the left, the contact details sit mid-page and the
+ * form on the right. `initialServices` comes from links like /kontakt?usluga=gletanje.
+ */
 export function Contact({ initialServices = [] }: { initialServices?: ServiceId[] }) {
-  const [type, setType] = useState<"person" | "business">("person");
-  const [services, setServices] = useState<ServiceId[]>(initialServices);
+  const [kind, setKind] = useState<Kind>("person");
   const [status, setStatus] = useState<Status>({ state: "idle" });
+  const [copied, setCopied] = useState(false);
+  // Switching tabs remounts the fields (so they rise in again); what was
+  // typed carries over through `draft`. `round` clears everything after a send.
+  const [draft, setDraft] = useState((): Record<string, string> => {
+    const service = SERVICES.find((s) => s.id === initialServices[0]);
+    return service ? { work: service.title } : {};
+  });
+  const [round, setRound] = useState(0);
+  const [switched, setSwitched] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const toggle = (id: ServiceId) =>
-    setServices((current) => (current.includes(id) ? current.filter((s) => s !== id) : [...current, id]));
+  // On desktop everything is sized in vw, shrunk on short screens so the page
+  // always fits one screen.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const fit = () => el.style.setProperty("--cm-fit", String(Math.min(1, window.innerHeight / 950)));
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(CONTACT.email);
+      setCopied(true);
+    } catch {
+      window.location.href = `mailto:${CONTACT.email}`;
+    }
+  };
+
+  const switchKind = (next: Kind) => {
+    if (next === kind) return;
+    if (formRef.current) {
+      setDraft(Object.fromEntries([...new FormData(formRef.current)].map(([k, v]) => [k, String(v)])));
+    }
+    setSwitched(true);
+    setKind(next);
+  };
+
+  // Tabs pattern: arrow keys move between the two tabs.
+  const onTabKey = (e: KeyboardEvent, i: number) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const to = (i + (e.key === "ArrowRight" ? 1 : -1) + KINDS.length) % KINDS.length;
+    switchKind(KINDS[to][0]);
+    tabRefs.current[to]?.focus();
+  };
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    const chosen = SERVICES.filter((s) => services.includes(s.id)).map((s) => s.title);
-    const note = String(data.get("note") || "").trim();
-    const message = [`Usluge: ${chosen.length ? chosen.join(", ") : "nije odabrano"}`, "", note || "(bez poruke)"].join("\n");
+    const data = new FormData(e.currentTarget);
+    const get = (key: string) => String(data.get(key) ?? "").trim();
+    const details = [
+      ["Kontakt osoba", get("contact")],
+      ["Lokacija", get("location")],
+      ["Vrsta radova", get("work")],
+      ["Okvirni budžet", get("budget")],
+      [kind === "business" ? "Vrsta objekta" : "Vrsta prostora", get("space")],
+      ["Kvadratura", get("size")],
+      ["Početak radova", get("start")],
+    ].filter(([, value]) => value);
+    const message = [...details.map(([label, value]) => `${label}: ${value}`), "", get("note") || "(bez poruke)"].join("\n");
 
     setStatus({ state: "sending" });
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, name: data.get("name"), email: data.get("email"), phone: data.get("phone"), message }),
+        body: JSON.stringify({ type: kind, name: get("name"), email: get("email"), phone: get("phone"), message }),
       });
       const json = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(json.error || "Slanje poruke nije uspjelo.");
       setStatus({ state: "sent" });
-      form.reset();
-      setServices([]);
+      setDraft({});
+      setRound((r) => r + 1);
     } catch (err) {
       setStatus({ state: "error", message: err instanceof Error ? err.message : "Došlo je do greške." });
     }
   };
 
+  const business = kind === "business";
+  let d = 0;
+
   return (
-    <section className="px-page pb-28 pt-36 lg:pb-40 lg:pt-44">
-      <div className="grid gap-16 lg:grid-cols-12 lg:gap-8">
-        <div className="lg:col-span-5">
-          <p data-reveal className="label dot text-muted">
-            Kontakt
-          </p>
-          <h1 data-reveal className="heading mt-6 text-[clamp(2rem,3.6vw,3.25rem)]">
-            Započnimo <em>razgovor.</em>
-          </h1>
-          <p data-reveal className="mt-6 max-w-sm text-muted">
-            Dolazimo na besplatan izlazak na teren i šaljemo jasnu ponudu.
-          </p>
-          <dl data-reveal className="mt-12 border-t border-line">
-            {[
-              ["Telefon", <a key="t" href={CONTACT.phoneHref} className="link">{CONTACT.phone}</a>],
-              ["E-mail", <a key="e" href={`mailto:${CONTACT.email}`} className="link">{CONTACT.email}</a>],
-              ["Radno vrijeme", CONTACT.hours],
-            ].map(([label, value]) => (
-              <div key={label as string} className="grid grid-cols-[8rem_1fr] border-b border-line py-4">
-                <dt className="label pt-1 text-muted">{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+    <section ref={sectionRef} className="cm">
+      <h1 className="sr-only">Kontakt</h1>
 
-        <form data-reveal onSubmit={onSubmit} className="space-y-10 lg:col-span-6 lg:col-start-7">
-          <fieldset>
-            <legend className="label mb-4 text-muted">Što vam treba?</legend>
-            <div className="flex flex-wrap gap-2">
-              {SERVICES.map((s) => {
-                const on = services.includes(s.id);
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => toggle(s.id)}
-                    aria-pressed={on}
-                    className={`h-10 border px-4 text-sm transition-colors duration-300 ${
-                      on ? "border-ink bg-ink text-paper" : "border-line hover:border-ink"
-                    }`}
-                  >
-                    {s.title}
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend className="label mb-2 text-muted">Vaši podaci</legend>
-            <div className="mb-2 flex gap-6">
-              {(
-                [
-                  ["person", "Privatna osoba"],
-                  ["business", "Tvrtka"],
-                ] as const
-              ).map(([value, label]) => (
-                <label key={value} className="flex cursor-pointer items-center gap-2 py-2 text-sm">
-                  <input
-                    type="radio"
-                    name="type"
-                    value={value}
-                    checked={type === value}
-                    onChange={() => setType(value)}
-                    className="h-3.5 w-3.5 appearance-none border border-ink checked:bg-ink"
-                  />
-                  {label}
-                </label>
+      {/* The page title, drifting past on a loop. */}
+      <div aria-hidden="true" className="cm-rotate">
+        <div className="cm-marquee">
+          <div className="cm-reveal">
+            <div className="cm-track">
+              {Array.from({ length: 6 }, (_, n) => (
+                <span key={n} className="cm-word">
+                  Kontakt
+                </span>
               ))}
             </div>
-            <div className="grid gap-x-6 sm:grid-cols-2">
-              <input name="name" required placeholder={type === "business" ? "Naziv tvrtke *" : "Ime i prezime *"} autoComplete="name" className={`${field} sm:col-span-2`} />
-              <input name="email" type="email" required placeholder="E-mail *" autoComplete="email" className={field} />
-              <input name="phone" type="tel" placeholder="Telefon" autoComplete="tel" className={field} />
-              <textarea name="note" rows={3} placeholder="Ukratko o prostoru i radovima" className={`${field} resize-none sm:col-span-2`} />
-            </div>
-          </fieldset>
+          </div>
+        </div>
+      </div>
 
-          <div className="flex flex-wrap items-center gap-6">
+      <div className="cm-stack">
+        <p className="cm-talk cm-fade">Razgovarajmo.</p>
+        <div className="cm-channels" aria-label="Kontakt podaci">
+          <div className="cm-channel cm-in" style={delay(0)}>
+            <p className="cm-label">E-mail</p>
             <button
-              type="submit"
-              disabled={status.state === "sending"}
-              className="label inline-flex h-12 items-center gap-3 bg-ink px-7 text-paper transition-colors duration-300 hover:bg-yellow hover:text-ink disabled:cursor-wait disabled:opacity-60"
+              type="button"
+              onClick={copyEmail}
+              aria-label={`Kopiraj e-mail adresu ${CONTACT.email}`}
+              className={`cm-value cm-underline cm-copy${copied ? " is-copied" : ""}`}
             >
-              {status.state === "sending" ? "Šaljem…" : "Pošalji upit"} <span aria-hidden="true">→</span>
+              <span className="cm-copy-label">{CONTACT.email}</span>
+              <span aria-hidden="true" className="cm-copy-feedback">
+                <svg viewBox="0 0 14 14" fill="none" className="size-[0.95em]">
+                  <path d="M2.5 7.5 5.5 10.5 11.5 4" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+                E-mail kopiran
+              </span>
             </button>
-            <p role="status" aria-live="polite" className="text-sm">
+            <span role="status" className="sr-only">
+              {copied && "E-mail adresa kopirana"}
+            </span>
+          </div>
+          <div className="cm-channel cm-in" style={delay(1)}>
+            <p className="cm-label">WhatsApp</p>
+            <a href={CONTACT.whatsappHref} target="_blank" rel="noopener noreferrer" className="cm-value cm-underline">
+              Pošaljite poruku
+            </a>
+          </div>
+          <div className="cm-channel cm-in" style={delay(2)}>
+            <p className="cm-label">Telefon</p>
+            <a href={CONTACT.phoneHref} className="cm-value cm-underline">
+              {CONTACT.phone}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="cm-aside">
+        <div role="tablist" aria-label="Tko šalje upit" className="cm-tabs cm-in" style={delay(3)}>
+          {KINDS.map(([value, label], n) => (
+            <button
+              key={value}
+              ref={(el) => {
+                tabRefs.current[n] = el;
+              }}
+              type="button"
+              role="tab"
+              id={`kontakt-tab-${value}`}
+              aria-selected={kind === value}
+              aria-controls="kontakt-forma"
+              tabIndex={kind === value ? 0 : -1}
+              onClick={() => switchKind(value)}
+              onKeyDown={(e) => onTabKey(e, n)}
+              className="cm-tab"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <form
+          key={`${kind}-${round}`}
+          ref={formRef}
+          id="kontakt-forma"
+          role="tabpanel"
+          aria-labelledby={`kontakt-tab-${kind}`}
+          onSubmit={onSubmit}
+          className="cm-form"
+          style={{ "--cm-base": switched ? "0ms" : "520ms" } as CSSProperties}
+        >
+          {business ? (
+            <div className="cm-row cm-in" style={delay(d++)}>
+              <input name="name" required defaultValue={draft.name} aria-label="Naziv tvrtke" placeholder="Naziv tvrtke*" autoComplete="organization" className="cm-field" />
+              <input name="contact" defaultValue={draft.contact} aria-label="Kontakt osoba" placeholder="Kontakt osoba" autoComplete="name" className="cm-field" />
+            </div>
+          ) : (
+            <div className="cm-in" style={delay(d++)}>
+              <input name="name" required defaultValue={draft.name} aria-label="Ime i prezime" placeholder="Ime i prezime*" autoComplete="name" className="cm-field" />
+            </div>
+          )}
+          <div className="cm-in" style={delay(d++)}>
+            <input name="email" type="email" required defaultValue={draft.email} aria-label="E-mail" placeholder="E-mail*" autoComplete="email" className="cm-field" />
+          </div>
+          <div className="cm-row cm-in" style={delay(d++)}>
+            <input name="phone" type="tel" required defaultValue={draft.phone} aria-label="Telefon" placeholder="Telefon*" autoComplete="tel" className="cm-field" />
+            <input name="location" defaultValue={draft.location} aria-label="Grad ili mjesto" placeholder="Grad / mjesto" autoComplete="address-level2" className="cm-field" />
+          </div>
+          {business ? (
+            <>
+              <div className="cm-row cm-in" style={delay(d++)}>
+                <Select name="space" placeholder="Vrsta objekta" options={SPACES.business} value={draft.space} />
+                <Select name="work" placeholder="Vrsta radova" options={WORKS} value={draft.work} />
+              </div>
+              <div className="cm-row cm-in" style={delay(d++)}>
+                <Select name="size" placeholder="Okvirna kvadratura" options={SIZES} value={draft.size} />
+                <Select name="start" placeholder="Početak radova" options={STARTS} value={draft.start} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="cm-row cm-in" style={delay(d++)}>
+                <Select name="budget" placeholder="Okvirni budžet" options={BUDGETS} value={draft.budget} />
+                <Select name="work" placeholder="Vrsta radova" options={WORKS} value={draft.work} />
+              </div>
+              <div className="cm-row cm-in" style={delay(d++)}>
+                <Select name="space" placeholder="Vrsta prostora" options={SPACES.person} value={draft.space} />
+                <Select name="start" placeholder="Početak radova" options={STARTS} value={draft.start} />
+              </div>
+            </>
+          )}
+          <div className="cm-in" style={delay(d++)}>
+            <textarea name="note" defaultValue={draft.note} aria-label="Poruka" placeholder="Poruka" className="cm-field" />
+          </div>
+          <label className="cm-consent cm-in" style={delay(d++)}>
+            <input type="checkbox" name="consent" required defaultChecked={draft.consent === "on"} />
+            <span>Slažem se da Žarko Sunce koristi moje podatke kako bi odgovorio na ovaj upit i javio mi se u vezi radova.</span>
+          </label>
+          <div className="cm-footer cm-in" style={delay(d++)}>
+            <button type="submit" disabled={status.state === "sending"} className="cm-submit">
+              {status.state === "sending" ? "Šaljem…" : "Pošalji"}
+            </button>
+            <p role="status" aria-live="polite" className="cm-value">
               {status.state === "sent" && "Hvala! Javit ćemo vam se uskoro."}
               {status.state === "error" && <span className="text-red-700">{status.message}</span>}
             </p>

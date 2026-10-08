@@ -13,8 +13,9 @@ const CARDS = ORDER.map((id) => SERVICES.find((s) => s.id === id)).filter((s) =>
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
- * Five plain service cards — one row on desktop, a swipeable strip on phones.
- * Each card opens the contact page with that service already ticked.
+ * Five plain service cards — one row on desktop, stacked on phones, two to a
+ * row in between. Each card opens the contact page with that service already
+ * ticked.
  */
 export function Services() {
   return (
@@ -31,9 +32,9 @@ export function Services() {
         />
       </div>
 
-      <ul className="px-page mt-16 flex snap-x snap-mandatory scroll-pl-6 gap-4 overflow-x-auto pb-2 [scrollbar-width:none] sm:scroll-pl-10 lg:mt-24 lg:grid lg:grid-cols-5 lg:gap-6 lg:overflow-visible lg:pb-0">
+      <ul className="px-page mt-16 grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:mt-24 lg:grid-cols-5">
         {CARDS.map((service, i) => (
-          <li key={service.id} className="w-[72vw] shrink-0 snap-start sm:w-[42vw] lg:w-auto">
+          <li key={service.id}>
             <Link id={`usluga-${service.id}`} href={`/kontakt?usluga=${service.id}`} className="group block">
               <Frame
                 photo={service.photo}

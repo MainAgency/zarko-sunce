@@ -14,26 +14,9 @@ import { Logo } from "./Logo";
  */
 const tile = "bg-tile/45 backdrop-blur-2xl backdrop-saturate-150 transition-colors duration-300";
 
-/** 3×3 dot grid; opening the menu drops the four edge dots, leaving an X. */
-function DotsIcon({ open }: { open: boolean }) {
-  return (
-    <span aria-hidden="true" className="grid grid-cols-3 gap-[3px]">
-      {Array.from({ length: 9 }, (_, i) => (
-        <span
-          key={i}
-          className={`h-[3px] w-[3px] bg-current transition-[opacity,transform] duration-300 ${
-            open && i % 2 === 1 ? "scale-0 opacity-0" : ""
-          }`}
-          style={{ transitionDelay: `${i * 25}ms` }}
-        />
-      ))}
-    </span>
-  );
-}
-
 /**
- * Centred, floating header: a logo tile and a menu tile side by side; the menu
- * drops down underneath them at the same width. Same layout on every screen.
+ * Centred, floating header: a logo tile and a square menu tile side by side;
+ * the menu drops down underneath them. Same layout on every screen.
  */
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -72,28 +55,31 @@ export function Header() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="izbornik"
-            className={`${tile} label flex h-14 w-40 items-center justify-between px-6 hover:bg-tile/70`}
+            aria-label={open ? "Zatvori izbornik" : "Otvori izbornik"}
+            className={`${tile} zs-burger grid h-14 w-14 place-content-center hover:bg-tile/70${open ? " is-open" : ""}`}
           >
-            {open ? "Zatvori" : "Meni"}
-            <DotsIcon open={open} />
+            <span className="zs-burger__line zs-burger__line--top" />
+            <span className="zs-burger__line zs-burger__line--middle" />
+            <span className="zs-burger__line zs-burger__line--bottom" />
           </button>
         </div>
 
         <nav
           id="izbornik"
           aria-label="Glavna navigacija"
-          className={`${tile} absolute inset-x-0 top-full mt-1 transition-[opacity,transform,visibility] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`${tile} absolute left-1/2 top-full mt-1 w-[max(100%,17rem)] -translate-x-1/2 transition-[opacity,translate,visibility] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0"
           }`}
         >
-          <ul className="py-4 text-center">
+          {/* Links in the headings' voice: light sans, turning serif italic on hover. */}
+          <ul className="py-5 text-center">
             {NAV.map((item, i) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   tabIndex={open ? 0 : -1}
                   onClick={close}
-                  className={`label block py-2.5 transition-[opacity,transform,color] duration-500 hover:text-muted ${
+                  className={`block py-1.5 text-[1.75rem] font-light leading-[1.15] tracking-[-0.015em] transition-[opacity,translate] duration-500 hover:font-serif hover:font-normal hover:italic hover:tracking-[-0.01em] focus-visible:font-serif focus-visible:font-normal focus-visible:italic ${
                     open ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
                   }`}
                   style={{ transitionDelay: open ? `${80 + i * 40}ms` : "0ms" } as CSSProperties}

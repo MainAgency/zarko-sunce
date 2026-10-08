@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Instrument_Serif, Inter_Tight } from "next/font/google";
+import { Archivo, Instrument_Serif } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 import { Footer } from "@/components/Footer";
@@ -7,10 +8,19 @@ import { Header } from "@/components/Header";
 import { RevealObserver } from "@/components/RevealObserver";
 import { seoRootDefaults } from "@/lib/seo";
 
-const sans = Inter_Tight({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-inter-tight",
+// Nohemi (Fontshare) is the site face. Only these three cuts are bundled, so
+// light (300) text renders in Regular. The generated metric-matched fallback
+// is off: its metrics come out at ~24% size, which shrinks glyphs Nohemi lacks
+// (the → arrows) to near-invisible.
+const nohemi = localFont({
+  src: [
+    { path: "./fonts/Nohemi-Regular.otf", weight: "400", style: "normal" },
+    { path: "./fonts/Nohemi-Medium.otf", weight: "500", style: "normal" },
+    { path: "./fonts/Nohemi-Bold.otf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-nohemi",
   display: "swap",
+  adjustFontFallback: false,
 });
 
 const serif = Instrument_Serif({
@@ -44,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="hr"
       suppressHydrationWarning
-      className={`${sans.variable} ${serif.variable} ${display.variable} h-full antialiased`}
+      className={`${nohemi.variable} ${serif.variable} ${display.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <noscript>
