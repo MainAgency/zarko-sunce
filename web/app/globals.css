@@ -33,6 +33,12 @@
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 }
 
+/*
+ * No overflow rules on <html> or <body>: on iOS Safari either one turns the
+ * body into its own scroller, which makes position: fixed (the header) drift
+ * while scrolling. Sideways overflow is clipped on the content wrapper in
+ * layout.tsx instead, which the header sits outside of.
+ */
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
@@ -40,7 +46,6 @@ html {
 }
 
 body {
-  overflow-x: clip;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { PROJECTS, projectMeta, type Photo, type Project } from "@/lib/content";
 
+import { BeforeAfter } from "./BeforeAfter";
 import { Frame } from "./Frame";
 import { SectionIntro } from "./SectionIntro";
 import { ZoomIntro } from "./ZoomIntro";
@@ -27,6 +28,9 @@ const INTRO_PHOTOS: Photo[] = Array.from(
     [...PROJECTS.map((p) => p.cover), ...PROJECTS.flatMap((p) => p.gallery)].map((photo) => [photo.src, photo]),
   ).values(),
 );
+
+/** The first before/after pair among the projects, shown as a wide slider under the selection. */
+const FEATURED_COMPARISON = PROJECTS.flatMap((p) => (p.comparisons ?? []).map((c) => ({ project: p, ...c })))[0];
 
 export function Projects() {
   return (
@@ -67,6 +71,37 @@ export function Projects() {
             </div>
           ))}
         </div>
+
+        {/* Before/after slider: drag the divider to compare the space before and after the work. */}
+        {FEATURED_COMPARISON && (
+          <div className="mt-20 lg:mt-28">
+            <div className="grid gap-4 lg:grid-cols-12">
+              <p data-reveal className="label dot text-muted lg:col-span-3 lg:pt-1">
+                Prije i poslije
+              </p>
+              <p data-reveal className="max-w-md text-muted lg:col-span-8 lg:col-start-5">
+                Povucite crtu lijevo ili desno i usporedite prostor prije i nakon radova.
+              </p>
+            </div>
+            <div data-reveal className="mt-10">
+              <BeforeAfter
+                before={FEATURED_COMPARISON.before}
+                after={FEATURED_COMPARISON.after}
+                width={2000}
+                className="aspect-square sm:aspect-[16/10]"
+              />
+              <Link
+                href={`/projekti/${FEATURED_COMPARISON.project.slug}`}
+                className="group mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1"
+              >
+                <span className="text-lg leading-tight sm:text-xl">
+                  <span className="link pb-1">{FEATURED_COMPARISON.project.title}</span> →
+                </span>
+                <span className="label text-muted">{projectMeta(FEATURED_COMPARISON.project)}</span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

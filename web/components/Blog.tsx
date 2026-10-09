@@ -22,7 +22,7 @@ export function Blog() {
         />
       </div>
 
-      <ul className="px-page mt-16 flex snap-x snap-mandatory scroll-pl-6 gap-4 overflow-x-auto pb-2 [scrollbar-width:none] sm:scroll-pl-10 lg:mt-24 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:pb-0">
+      <ul className="px-page mt-16 flex snap-x snap-mandatory scroll-pl-6 gap-4 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] sm:scroll-pl-10 lg:mt-24 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:pb-0">
         {POSTS.map((post, i) => (
           <li key={post.slug} className="w-[72vw] shrink-0 snap-start sm:w-[42vw] lg:w-auto">
             <Link href={`/blog/${post.slug}`} className="group block">

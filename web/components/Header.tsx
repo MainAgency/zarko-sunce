@@ -12,7 +12,10 @@ import { Logo } from "./Logo";
  * third. Translucent enough that whatever scrolls underneath shows through,
  * heavily blurred.
  */
-const tile = "bg-tile/45 backdrop-blur-2xl backdrop-saturate-150 transition-colors duration-300";
+// transform-gpu gives each frosted tile its own compositing layer: WebKit on real
+// iPhones otherwise lets backdrop-filter children of a fixed header lag behind
+// the scroll and visibly slide before snapping back.
+const tile = "bg-tile/45 backdrop-blur-2xl backdrop-saturate-150 transform-gpu transition-colors duration-300";
 
 /**
  * Centred, floating header: a logo tile and a square menu tile side by side;
@@ -39,7 +42,7 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
+    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex transform-gpu justify-center px-4">
       <div ref={ref} className="pointer-events-auto relative text-ink">
         <div className="flex gap-1">
           <Link

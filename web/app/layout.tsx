@@ -61,8 +61,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-reveal] .reveal-mask{clip-path:none!important}[data-reveal] .reveal-inner{transform:none!important}`}</style>
         </noscript>
         <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {/* Clips sideways overflow (marquees, reveals) without touching <html>/<body>,
+            so the fixed header keeps the viewport as its containing block on iOS. */}
+        <div className="flex flex-1 flex-col overflow-x-clip">
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
         <RevealObserver />
       </body>
     </html>
