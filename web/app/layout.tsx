@@ -49,6 +49,9 @@ export const viewport: Viewport = {
   themeColor: "#f3f2ee",
 };
 
+/** Runs before paint so a saved dark theme never flashes light. Default is light. */
+const themeScript = `try{if(localStorage.getItem("theme")==="dark"){document.documentElement.dataset.theme="dark"}}catch(e){}`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -56,6 +59,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${nohemi.variable} ${serif.variable} ${display.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-reveal] .reveal-mask{clip-path:none!important}[data-reveal] .reveal-inner{transform:none!important}`}</style>

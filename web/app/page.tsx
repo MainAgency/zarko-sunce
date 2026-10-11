@@ -30,7 +30,7 @@ export default function Home() {
       <NewsPortal />
       <Blog />
       <div id="kontakt">
-        <LetsWorkTogether href="/kontakt" email={CONTACT.email} />
+        <LetsWorkTogether />
       </div>
     </>
   );

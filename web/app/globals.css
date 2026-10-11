@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* `dark:` utilities follow the theme attribute set by the header toggle. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   --background: #f3f2ee;
   --foreground: #121212;
@@ -15,6 +18,21 @@
   --muted-foreground: var(--muted);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.18, 1);
+  color-scheme: light;
+}
+
+/* Dark theme: ink and paper swap roles, so "ink on paper" buttons and panels
+   invert with the page. Yellow stays; anything that must stay dark on top of
+   a photo uses black instead of ink. */
+:root[data-theme="dark"] {
+  --background: #151514;
+  --foreground: #f3f2ee;
+  --paper: #1d1d1b;
+  --muted: #9d9990;
+  --line: rgb(243 242 238 / 0.14);
+  --ink: #f3f2ee;
+  --tile: #2c2c29;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -64,7 +82,7 @@ textarea {
 
 ::selection {
   background: var(--yellow);
-  color: var(--ink);
+  color: #121212;
 }
 
 /* ---------- Layout ---------- */
@@ -231,298 +249,154 @@ em.accent {
   transform: scaleX(0.33);
 }
 
-/* Menu: a card over a dimmed page, settling in from slightly larger. Sizes
-   are fluid (px + vw/vh) so it keeps its proportions on any screen. */
-.zs-menu {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  /* No panning, scroll chaining or drag-selecting inside the menu. */
-  overscroll-behavior: contain;
-  touch-action: none;
-  user-select: none;
-  padding: 20px;
-  background: rgb(0 0 0 / 0.4);
-  color: var(--ink);
-  opacity: 0;
-  visibility: hidden;
-  /* Never in the way once closed, even while it is still fading out. */
-  pointer-events: none;
-  transform: scale(1.1);
-  transition:
-    opacity 0.5s,
-    visibility 0.5s,
-    transform 0.5s;
+/* Open: the lines fold into an X. */
+.zs-burger.is-open .zs-burger__line {
+  transform-origin: center;
 }
-/* Visible at once on open (so focus can move in), faded out on close. */
-.zs-menu.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: none;
-  transition:
-    opacity 0.5s,
-    visibility 0s,
-    transform 0.5s;
+.zs-burger.is-open .zs-burger__line--top {
+  transform: translateY(8px) rotate(-45deg) scaleX(1);
 }
-@media (min-width: 1200px) {
-  .zs-menu {
-    padding: 50px;
-  }
-}
-.zs-menu__panel {
-  display: flex;
-  height: 100%;
-  background: var(--paper);
-}
-
-/* The photo is uncovered left to right by a panel-coloured mask. */
-.zs-menu__media {
-  display: none;
-  position: relative;
-  flex: none;
-  width: calc(250px + 13.27vw);
-  overflow: hidden;
-}
-@media (min-width: 1200px) {
-  .zs-menu__media {
-    display: block;
-  }
-}
-.zs-menu__photo {
-  transform: scale(1.15);
-  transition: transform 1.6s var(--ease);
-}
-.zs-menu__mask {
-  position: absolute;
-  inset: 0;
-  background: var(--paper);
-  transform-origin: right center;
-  transition: transform 1.1s var(--ease-in-out) 0.2s;
-}
-.zs-menu.is-open .zs-menu__photo {
-  transform: none;
-}
-.zs-menu.is-open .zs-menu__mask {
+.zs-burger.is-open .zs-burger__line--middle {
   transform: scaleX(0);
 }
-
-.zs-menu__body {
-  display: flex;
-  flex: 1 0 0;
-  flex-direction: column;
-  min-width: 0;
-  padding: 0 25px;
-}
-@media (min-width: 768px) {
-  .zs-menu__body {
-    padding: 0 calc(0.87px + 7.77vw);
-  }
-}
-@media (min-width: 1200px) {
-  .zs-menu__body {
-    margin: 0 calc(-33.33px + 6.94vw) 0 calc(-200px + 20.83vw);
-    padding: 0;
-  }
+.zs-burger.is-open .zs-burger__line--bottom {
+  transform: translateY(-8px) rotate(45deg) scaleX(1);
 }
 
-.zs-menu__head {
-  display: flex;
-  align-items: center;
-  padding: 3vh 0 2.5vh;
-  font-size: clamp(22px, 14px + 1.25vw, 40px);
-}
-@media (min-width: 768px) {
-  .zs-menu__head {
-    padding: 2vh 0 12vh;
-  }
-}
-@media (min-width: 1200px) {
-  .zs-menu__head {
-    padding: 4.6vh 0 calc(-53px + 16.95vh);
-  }
-}
-.zs-menu__contacts,
-.zs-menu__foot {
-  font-size: 16px;
-}
-@media (min-width: 768px) {
-  .zs-menu__contacts,
-  .zs-menu__foot {
-    font-size: calc(6.27px + 1.06vh + 0.38vw);
-  }
-}
-.zs-menu__contacts {
-  display: none;
-  gap: 1.1em;
-  margin-right: auto;
-}
-.zs-menu__logo {
-  margin-right: auto;
-}
-@media (min-width: 1200px) {
-  .zs-menu__contacts {
-    display: flex;
-  }
-  .zs-menu__logo {
-    margin-right: 2rem;
-  }
-}
-
-/* Square close button; its X spins flat on hover. */
-.zs-close {
-  position: relative;
-  flex: none;
-  width: 80px;
-  height: 80px;
-  border: 1px solid;
-  cursor: pointer;
-}
-@media (min-width: 1200px) {
-  .zs-close {
-    width: calc(-5.63px + 4.84vh + 1.74vw);
-    height: calc(-5.63px + 4.84vh + 1.74vw);
-  }
-}
-.zs-close__line {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 40px;
-  height: 1px;
-  margin-left: -20px;
-  background: currentColor;
-  transition: transform 0.75s;
-}
-.zs-close__line--top {
-  transform: rotate(45deg);
-}
-.zs-close__line--bottom {
-  transform: rotate(-45deg);
-}
-.zs-close:hover .zs-close__line--top {
-  transform: rotate(180deg);
-}
-.zs-close:hover .zs-close__line--bottom {
-  transform: rotate(0deg);
-}
-
-/* Links slide in from the left edge, one after another. */
-.zs-menu__middle {
-  position: relative;
-  flex: 1 0 0;
-  min-height: 0;
+/* Menu card (after fluid.glass): a dark panel under the header tiles. Each
+   text line sits in a mask and slides up into view when the menu opens, in
+   order from the top; the big links carry a second copy that rolls up on hover. */
+.zs-menu__mask {
   overflow: hidden;
 }
-.zs-menu__list {
-  width: 100%;
+.zs-menu__line {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 0.9s var(--ease);
+  transition-delay: var(--d, 0ms);
 }
-@media (min-width: 768px) {
-  .zs-menu__list {
-    width: 50%;
-  }
-}
-@media (min-width: 1200px) {
-  .zs-menu__list {
-    width: calc(-0.44px + 21.12vw);
-  }
-}
-.zs-menu__item:not(:first-child) {
-  margin-top: 3.7vh;
-}
-@media (min-width: 768px) {
-  .zs-menu__item:not(:first-child) {
-    margin-top: 3vh;
-  }
+.zs-menu.is-open .zs-menu__line {
+  transform: none;
 }
 .zs-menu__link {
-  display: inline-block;
-  color: var(--muted);
-  font-size: 25px;
-  line-height: 1.4;
-  opacity: 0;
-  transform: translateX(-105%);
-  transition:
-    color 0.3s,
-    opacity 0.6s var(--ease),
-    transform 0.9s var(--ease);
+  position: relative;
+  display: block;
 }
-@media (min-width: 768px) {
-  .zs-menu__link {
-    font-size: calc(-3.67px + 1.83vh + 0.98vw);
-    line-height: 1.28;
-  }
+.zs-menu__link .zs-menu__roll {
+  display: block;
+  transition: transform 0.7s var(--ease);
 }
-.zs-menu.is-open .zs-menu__link {
-  opacity: 1;
+.zs-menu__link .zs-menu__roll[aria-hidden] {
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+}
+.zs-menu__link:hover .zs-menu__roll,
+.zs-menu__link:focus-visible .zs-menu__roll {
+  transform: translateY(-100%);
+}
+.zs-menu__link:hover .zs-menu__roll[aria-hidden],
+.zs-menu__link:focus-visible .zs-menu__roll[aria-hidden] {
   transform: none;
-  transition-delay: 0s, calc(0.2s + var(--i) * 60ms), calc(0.2s + var(--i) * 60ms);
 }
-.zs-menu__link:hover,
-.zs-menu__item:hover > .zs-menu__link {
-  color: var(--ink);
+/* The item's mask clips overflow, so it leaves room on the left for the
+   star that marks the page you are on (drawn in Header.tsx). */
+.zs-menu__item {
+  margin-left: -1.25rem;
+  padding-left: 1.25rem;
 }
-
-/* "Usluge" fans the services out in a column to its right. */
-.zs-menu__sublist {
-  display: none;
-}
-@media (min-width: 768px) {
-  .zs-menu__sublist {
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 50%;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-20%);
-    transition:
-      visibility 1s,
-      opacity 0.5s,
-      transform 0.5s;
-  }
-  .zs-menu__item:hover > .zs-menu__sublist,
-  .zs-menu__item:focus-within > .zs-menu__sublist {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-  }
-}
-@media (min-width: 1200px) {
-  .zs-menu__sublist {
-    width: calc(-0.44px + 21.12vw);
-  }
-}
-.zs-menu__sublist li:not(:first-child) {
-  margin-top: 3vh;
-}
-.zs-menu__sublink {
-  font-size: calc(7.15px + 0.73vh + 0.26vw);
-  font-weight: 500;
-  line-height: 1.75;
-  transition: color 0.3s;
-}
-.zs-menu__sublink:hover {
-  color: var(--muted);
+.zs-menu__item .zs-menu__line {
+  position: relative;
 }
 
-.zs-menu__foot {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  padding: 8vh 0;
-  white-space: nowrap;
+/* ---------- Services (pinned scroller) ---------- */
+
+/* --col: one column; --win: the window's left edge. A quarter of the screen
+   at half-way on desktop, one wide column on phones. */
+.zs-svc {
+  --col: 84vw;
+  --win: 8vw;
 }
 @media (min-width: 768px) {
-  .zs-menu__foot {
-    padding: 3vh 0;
+  .zs-svc {
+    --col: 25vw;
+    --win: 50vw;
   }
 }
-@media (min-width: 1200px) {
-  .zs-menu__foot {
-    display: none;
+/* Rows start at the window and shift left one column per service. */
+.zs-svc__row {
+  width: max-content;
+  transform: translateX(calc(var(--win) - var(--x) * var(--col)));
+  will-change: transform;
+}
+/* Photos sit inside the window already, so they skip its offset. */
+.zs-svc__row--photos {
+  transform: translateX(calc(var(--x) * var(--col) * -1));
+}
+/* The white copy of the names shows only inside the window column. */
+.zs-svc__lit {
+  clip-path: inset(0 calc(100% - var(--win) - var(--col)) 0 var(--win));
+}
+.zs-svc__swap {
+  animation: swap-in 0.6s var(--ease) both;
+}
+
+/* ---------- Closing call to action (puzzle) ---------- */
+
+/* Pieces are moved by script (scroll position); each rotates about its own
+   centre, given inline in board units. */
+.zs-puzzle__piece,
+.zs-puzzle__missing,
+.zs-puzzle__bob {
+  transform-box: view-box;
+}
+.zs-puzzle__piece {
+  will-change: transform, opacity;
+}
+
+/* The gap and "your" piece stay hidden until the rest is in; then the piece
+   waits beside its gap. */
+.zs-puzzle__hole {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+.zs-puzzle[data-ready] .zs-puzzle__hole {
+  opacity: 1;
+}
+.zs-puzzle__missing {
+  opacity: 0;
+  transform: translate(92px, -48px) rotate(14deg);
+  transition:
+    transform 0.9s var(--ease),
+    opacity 0.5s var(--ease);
+}
+.zs-puzzle[data-ready] .zs-puzzle__missing {
+  opacity: 1;
+}
+.zs-puzzle__bob {
+  animation: zs-bob 3.2s ease-in-out infinite;
+}
+@keyframes zs-bob {
+  50% {
+    transform: translateY(-7px) rotate(-3deg);
+  }
+}
+
+/* Snaps in on hover or keyboard focus — on touch, by itself once ready. */
+.group:hover .zs-puzzle[data-ready] .zs-puzzle__missing,
+.group:focus-visible .zs-puzzle[data-ready] .zs-puzzle__missing,
+.zs-puzzle[data-complete] .zs-puzzle__missing {
+  transform: none;
+}
+.group:hover .zs-puzzle[data-ready] .zs-puzzle__bob,
+.group:focus-visible .zs-puzzle[data-ready] .zs-puzzle__bob,
+.zs-puzzle[data-complete] .zs-puzzle__bob {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zs-puzzle__bob {
+    animation: none;
   }
 }
 
@@ -947,7 +821,7 @@ em.accent {
 .cm-tabs {
   display: flex;
   margin-bottom: calc(2.5 * var(--u) + var(--cm-form-gap) * 0.35);
-  border-bottom: 1px solid rgb(18 18 18 / 0.18);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
 }
 .cm-tab {
   position: relative;
@@ -1007,7 +881,7 @@ em.accent {
   min-width: 0;
   padding: calc(1.08 * var(--u)) 0;
   border: 0;
-  border-bottom: 1px solid rgb(18 18 18 / 0.25);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
   background: transparent;
   color: var(--ink);
   font-size: var(--cm-input);

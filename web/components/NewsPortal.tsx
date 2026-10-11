@@ -69,17 +69,19 @@ export function NewsPortal() {
         scrollLength={2.2}
         maxWordWidth={520}
         enterLabel="Uđite u novosti"
+        // The field stays near-black in both themes (its type is white), so it
+        // uses a fixed colour rather than --ink, which turns light in dark mode.
         style={{
           "--gp-paper": "var(--background)",
-          "--gp-ink": "var(--ink)",
-          "--gp-field": "var(--ink)",
+          "--gp-ink": "var(--foreground)",
+          "--gp-field": "#121212",
           "--gp-foreground": "#ffffff",
         }}
         background={
           <div className="absolute inset-0" style={{ transform: "scale(var(--gp-field-scale,1))" }}>
             <Image src={photoUrl(PHOTOS.hallSkylight, 2000)} alt="" fill sizes="100vw" className="object-cover" />
             {/* Deepens to near-solid ink as the news fades in, so the cards' photos don't sit on another photo. */}
-            <div className="absolute inset-0 bg-ink" style={{ opacity: "calc(0.6 + var(--gp-reveal, 0) * 0.34)" }} />
+            <div className="absolute inset-0 bg-[#121212]" style={{ opacity: "calc(0.6 + var(--gp-reveal, 0) * 0.34)" }} />
           </div>
         }
         front={

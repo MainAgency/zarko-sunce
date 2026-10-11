@@ -60,7 +60,7 @@ export function HeroCarousel() {
       id="top"
       aria-roledescription="carousel"
       aria-label="Istaknuto"
-      className="hero relative h-svh min-h-[36rem] touch-pan-y select-none overflow-hidden bg-ink text-white"
+      className="hero relative h-svh min-h-[36rem] touch-pan-y select-none overflow-hidden bg-black text-white"
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       onFocus={() => setHovering(true)}
@@ -217,7 +217,7 @@ export function HeroCarousel() {
             type="button"
             onClick={() => go(index - 1)}
             aria-label="Prethodni slajd"
-            className="grid h-11 w-11 place-items-center border border-white/35 transition-colors hover:bg-white hover:text-ink"
+            className="grid h-11 w-11 place-items-center border border-white/35 transition-colors hover:bg-white hover:text-black"
           >
             ←
           </button>
@@ -225,7 +225,7 @@ export function HeroCarousel() {
             type="button"
             onClick={() => go(index + 1)}
             aria-label="Sljedeći slajd"
-            className="grid h-11 w-11 place-items-center border border-l-0 border-white/35 transition-colors hover:bg-white hover:text-ink"
+            className="grid h-11 w-11 place-items-center border border-l-0 border-white/35 transition-colors hover:bg-white hover:text-black"
           >
             →
           </button>

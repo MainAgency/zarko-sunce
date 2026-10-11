@@ -74,10 +74,10 @@ export function BeforeAfter({ before, after, width = 1400, className = "aspect-s
         <Image src={photoUrl(before, width)} alt={before.alt} fill sizes={sizes} draggable={false} className="object-cover" />
       </div>
 
-      <span aria-hidden="true" className="label absolute left-3 top-3 bg-ink/70 px-2.5 py-1.5 text-white sm:left-4 sm:top-4">
+      <span aria-hidden="true" className="label absolute left-3 top-3 bg-black/60 px-2.5 py-1.5 text-white sm:left-4 sm:top-4">
         Prije
       </span>
-      <span aria-hidden="true" className="label absolute right-3 top-3 bg-ink/70 px-2.5 py-1.5 text-white sm:right-4 sm:top-4">
+      <span aria-hidden="true" className="label absolute right-3 top-3 bg-black/60 px-2.5 py-1.5 text-white sm:right-4 sm:top-4">
         Poslije
       </span>
 
@@ -92,7 +92,7 @@ export function BeforeAfter({ before, after, width = 1400, className = "aspect-s
           aria-valuenow={Math.round(pos)}
           aria-valuetext={`${Math.round(pos)} % fotografije prije radova`}
           onKeyDown={onKeyDown}
-          className="pointer-events-auto absolute left-1/2 top-1/2 flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-yellow text-ink shadow-[0_4px_20px_rgb(0_0_0/0.25)] outline-offset-4 focus-visible:outline-2 focus-visible:outline-white"
+          className="pointer-events-auto absolute left-1/2 top-1/2 flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-yellow text-black shadow-[0_4px_20px_rgb(0_0_0/0.25)] outline-offset-4 focus-visible:outline-2 focus-visible:outline-white"
         >
           <ChevronLeft aria-hidden="true" strokeWidth={1.75} className="-mr-1 size-4" />
           <ChevronRight aria-hidden="true" strokeWidth={1.75} className="-ml-1 size-4" />

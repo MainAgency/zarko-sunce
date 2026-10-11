@@ -9,6 +9,8 @@ export const CONTACT = {
   phoneHref: "tel:+38500000000",
   whatsappHref: "https://wa.me/38500000000",
   email: "info@zarko-sunce.hr",
+  instagram: "https://www.instagram.com/zarkosunce",
+  facebook: "https://www.facebook.com/zarkosunce",
   area: "Grad i okolica",
   hours: "Pon – Pet, 07:00 – 16:00",
 };

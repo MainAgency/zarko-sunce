@@ -98,14 +98,18 @@ export default async function ProjectPage({ params }: Props) {
                 Povucite crtu lijevo ili desno i usporedite prostor prije i nakon radova.
               </p>
             </div>
-            <div data-reveal className="mt-10 grid gap-6 sm:grid-cols-2">
+            {/* A single slider stays narrower than the page on desktop; a pair shares a row. */}
+            <div
+              data-reveal
+              className={project.comparisons.length === 1 ? "mx-auto mt-10 max-w-4xl" : "mt-10 grid gap-6 sm:grid-cols-2"}
+            >
               {project.comparisons.map(({ before, after }, i, all) => (
                 <BeforeAfter
                   key={before.src}
                   before={before}
                   after={after}
-                  width={all.length === 1 ? 2000 : 1200}
-                  className={all.length === 1 ? "aspect-square sm:col-span-2 sm:aspect-[16/10]" : "aspect-square"}
+                  width={all.length === 1 ? 1600 : 1200}
+                  className={all.length === 1 ? "aspect-square sm:aspect-[16/10]" : "aspect-square"}
                 />
               ))}
             </div>

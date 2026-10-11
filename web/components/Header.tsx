@@ -1,30 +1,81 @@
 "use client";
 
+import { CornerDownRight, Sparkle } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { CONTACT, NAV } from "@/lib/content";
 
 import { Logo } from "./Logo";
+import { FacebookIcon, InstagramIcon } from "./SocialIcons";
+import { ThemeToggle } from "./ThemeToggle";
 
 /**
- * Frosted-glass square tile — the header is two of these, the menu panel a
+ * Frosted-glass square tile — the header is two of these, the menu card a
  * third. Translucent enough that whatever scrolls underneath shows through,
- * heavily blurred.
+ * heavily blurred, in the theme's own tint.
  */
 // transform-gpu gives each frosted tile its own compositing layer: WebKit on real
 // iPhones otherwise lets backdrop-filter children of a fixed header lag behind
 // the scroll and visibly slide before snapping back.
 const tile = "bg-tile/45 backdrop-blur-2xl backdrop-saturate-150 transform-gpu transition-colors duration-300";
 
+const EASE = "ease-[cubic-bezier(0.22,1,0.36,1)]";
+
+/** The small two-column block under the links: contact on the left, social icons on the right. */
+const CONTACTS = [
+  { href: CONTACT.phoneHref, label: CONTACT.phone },
+  { href: `mailto:${CONTACT.email}`, label: CONTACT.email },
+];
+const SOCIAL = [
+  { href: CONTACT.instagram, label: "Instagram", Icon: InstagramIcon },
+  { href: CONTACT.facebook, label: "Facebook", Icon: FacebookIcon },
+];
+
+/*
+ * Opening choreography (ms): the logo slides up out of its tile, the tile folds
+ * shut so the menu button glides to the centre, then the card unfolds under it
+ * and its lines rise one after another. Closing runs the same steps backwards.
+ */
+const T = {
+  logoFade: 320,
+  tileFold: 520,
+  foldStart: 180, // tile starts folding while the logo is still fading
+  cardStart: 480, // card appears as the fold settles
+  lineStart: 560,
+  closeCard: 320,
+  closeFoldStart: 120,
+  closeLogoStart: 420,
+};
+
 /**
- * Centred, floating header: a logo tile and a square menu tile side by side;
- * the menu drops down underneath them. Same layout on every screen.
+ * Centred, floating header: a logo tile and a square menu tile side by side.
+ * The menu is a frosted card in the theme's tint (after fluid.glass): the big
+ * links sit on the left with a marker on the current page, contact and social
+ * links follow in two small columns, the quote button and the theme switch
+ * close the card. The page dims behind it.
  */
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [hash, setHash] = useState("");
+  const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
   const close = () => setOpen(false);
+
+  // The current page gets a marker; the home sections go by the URL hash.
+  useEffect(() => {
+    const read = () => setHash(window.location.hash);
+    read();
+    window.addEventListener("hashchange", read);
+    return () => window.removeEventListener("hashchange", read);
+  }, [pathname]);
+  // Routes render with a trailing slash, so compare without it.
+  const current = pathname.replace(/\/+$/, "") || "/";
+  const isActive = (href: string) => {
+    const [path, frag] = href.split("#");
+    return frag ? current === path && hash === `#${frag}` : current === path;
+  };
 
   // Escape or a click anywhere outside closes the menu.
   useEffect(() => {
@@ -41,72 +92,166 @@ export function Header() {
     };
   }, [open]);
 
-  return (
-    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex transform-gpu justify-center px-4">
-      <div ref={ref} className="pointer-events-auto relative text-ink">
-        <div className="flex gap-1">
-          <Link
-            href="/"
-            aria-label="Žarko Sunce — početna"
-            onClick={close}
-            className={`${tile} flex h-14 items-center px-6 hover:bg-tile/70`}
-          >
-            <Logo className="text-[22px]" />
-          </Link>
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-controls="izbornik"
-            aria-label={open ? "Zatvori izbornik" : "Otvori izbornik"}
-            className={`${tile} zs-burger grid h-14 w-14 place-content-center hover:bg-tile/70${open ? " is-open" : ""}`}
-          >
-            <span className="zs-burger__line zs-burger__line--top" />
-            <span className="zs-burger__line zs-burger__line--middle" />
-            <span className="zs-burger__line zs-burger__line--bottom" />
-          </button>
-        </div>
+  const tab = open ? 0 : -1;
+  /** Stagger for the card's masked lines, top to bottom, after the card has unfolded. */
+  const line = (i: number): CSSProperties => ({ "--d": open ? `${T.lineStart + i * 45}ms` : "0ms" }) as CSSProperties;
+  // Lines reveal in order: title, links, the two small columns, then the button row.
+  const subStart = 1 + NAV.length;
+  const buttonIndex = subStart + CONTACTS.length;
 
-        <nav
-          id="izbornik"
-          aria-label="Glavna navigacija"
-          className={`${tile} absolute left-1/2 top-full mt-1 w-[max(100%,17rem)] -translate-x-1/2 transition-[opacity,translate,visibility] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0"
-          }`}
-        >
-          {/* Links in the headings' voice: light sans, turning serif italic on hover. */}
-          <ul className="py-5 text-center">
-            {NAV.map((item, i) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  tabIndex={open ? 0 : -1}
-                  onClick={close}
-                  className={`block py-1.5 text-[1.75rem] font-light leading-[1.15] tracking-[-0.015em] transition-[opacity,translate] duration-500 hover:font-serif hover:font-normal hover:italic hover:tracking-[-0.01em] focus-visible:font-serif focus-visible:font-normal focus-visible:italic ${
-                    open ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
-                  }`}
-                  style={{ transitionDelay: open ? `${80 + i * 40}ms` : "0ms" } as CSSProperties}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className="border-t border-line p-4 text-center">
+  return (
+    <>
+      {/* Dims the page while the menu is open; any click on it closes the menu. */}
+      <div
+        aria-hidden="true"
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-700 ${EASE} ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+
+      <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex transform-gpu justify-center px-4">
+        <div ref={ref} className="pointer-events-auto relative text-foreground">
+          <div className="flex">
+            {/* Logo tile: the logo slides up, then the tile folds shut, leaving the menu button alone. */}
             <Link
-              href="/kontakt"
-              tabIndex={open ? 0 : -1}
+              href="/"
+              aria-label="Žarko Sunce — početna"
+              tabIndex={open ? -1 : 0}
               onClick={close}
-              className="label flex h-11 items-center justify-center bg-ink text-paper transition-colors duration-300 hover:bg-yellow hover:text-ink"
+              className={`${tile} flex h-14 items-center overflow-hidden whitespace-nowrap transition-[max-width,padding,margin,visibility] ${EASE} hover:bg-tile/70 ${
+                open ? "invisible mr-0 max-w-0 px-0" : "visible mr-1 max-w-64 px-6"
+              }`}
+              style={{
+                transitionDuration: `${T.tileFold}ms`,
+                transitionDelay: open ? `${T.foldStart}ms` : `${T.closeFoldStart}ms`,
+              }}
             >
-              Zatražite ponudu
+              <span
+                className={`block transition-[opacity,translate] ${EASE} ${open ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}`}
+                style={{
+                  transitionDuration: open ? `${T.logoFade}ms` : "500ms",
+                  transitionDelay: open ? "0ms" : `${T.closeLogoStart}ms`,
+                }}
+              >
+                <Logo className="text-[22px]" />
+              </span>
             </Link>
-            <a href={CONTACT.phoneHref} tabIndex={open ? 0 : -1} className="label mt-3 block text-muted transition-colors hover:text-ink">
-              {CONTACT.phone}
-            </a>
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-controls="izbornik"
+              aria-label={open ? "Zatvori izbornik" : "Otvori izbornik"}
+              className={`${tile} zs-burger grid h-14 w-14 place-content-center hover:bg-tile/70${open ? " is-open" : ""}`}
+            >
+              <span className="zs-burger__line zs-burger__line--top" />
+              <span className="zs-burger__line zs-burger__line--middle" />
+              <span className="zs-burger__line zs-burger__line--bottom" />
+            </button>
           </div>
-        </nav>
-      </div>
-    </header>
+
+          <nav
+            id="izbornik"
+            aria-label="Glavna navigacija"
+            className={`zs-menu absolute left-1/2 top-full mt-1 w-[min(calc(100vw-2rem),22.5rem)] origin-top -translate-x-1/2 bg-tile/70 p-[clamp(1.75rem,3.75vw,3.25rem)] text-foreground backdrop-blur-2xl backdrop-saturate-150 transition-[opacity,transform,visibility] ${EASE} ${
+              open ? "is-open visible scale-100 opacity-100" : "invisible scale-[0.96] opacity-0"
+            }`}
+            style={{
+              transitionDuration: open ? "600ms" : `${T.closeCard}ms`,
+              transitionDelay: open ? `${T.cardStart}ms` : "0ms",
+            }}
+          >
+            <p className="zs-menu__mask label mb-4 text-[10px] text-muted">
+              <span className="zs-menu__line" style={line(0)}>
+                Izbornik
+              </span>
+            </p>
+
+            <ul>
+              {NAV.map((item, i) => (
+                <li
+                  key={item.href}
+                  className={`zs-menu__item zs-menu__mask relative${isActive(item.href) ? " is-active" : ""}`}
+                >
+                  <span className="zs-menu__line" style={line(1 + i)}>
+                    {/* Four-point star against the page you are on (after fluid.glass's section marks). */}
+                    {isActive(item.href) && (
+                      <Sparkle
+                        aria-hidden="true"
+                        className="absolute -left-4 top-1/2 size-2.5 -translate-y-1/2 fill-current text-yellow"
+                      />
+                    )}
+                    <Link
+                      href={item.href}
+                      tabIndex={tab}
+                      onClick={close}
+                      aria-current={isActive(item.href) ? "page" : undefined}
+                      className="zs-menu__link w-fit text-[clamp(1.625rem,2vw,2rem)] font-light leading-[1.15] tracking-[-0.02em]"
+                    >
+                      <span className="zs-menu__roll">{item.label}</span>
+                      <span className="zs-menu__roll" aria-hidden="true">
+                        {item.label}
+                      </span>
+                    </Link>
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="my-7 grid grid-cols-2 gap-x-4 text-[12px] leading-[1.3] text-muted">
+              <ul>
+                {CONTACTS.map((item, i) => (
+                  <li key={item.href} className="zs-menu__mask">
+                    <span className="zs-menu__line" style={line(subStart + i)}>
+                      <a
+                        href={item.href}
+                        tabIndex={tab}
+                        className="block py-0.5 transition-colors duration-300 hover:text-foreground"
+                      >
+                        {item.label}
+                      </a>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <ul className="zs-menu__mask flex items-start justify-end gap-4">
+                {SOCIAL.map(({ href, label, Icon }, i) => (
+                  <li key={href} className="zs-menu__line" style={line(subStart + i)}>
+                    <a
+                      href={href}
+                      tabIndex={tab}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      title={label}
+                      className="block py-0.5 transition-colors duration-300 hover:text-foreground"
+                    >
+                      <Icon className="size-5" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="zs-menu__mask">
+              <span className="zs-menu__line" style={line(buttonIndex)}>
+                <span className="flex items-stretch gap-1">
+                  <Link
+                    href="/kontakt"
+                    tabIndex={tab}
+                    onClick={close}
+                    className="label flex h-11 flex-1 items-center justify-center gap-2.5 bg-ink text-[10px] text-paper transition-colors duration-300 hover:bg-yellow hover:text-black"
+                  >
+                    <CornerDownRight aria-hidden="true" strokeWidth={1.5} className="size-3.5" />
+                    Zatražite ponudu
+                  </Link>
+                  <ThemeToggle tabIndex={tab} className="h-11 w-11" />
+                </span>
+              </span>
+            </div>
+          </nav>
+        </div>
+      </header>
+    </>
   );
 }

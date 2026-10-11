@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 /*
  * Adapted from the 21st.dev "cinematic list" for this site:
  *  - items come in as props and each row is a link;
- *  - colours use the site tokens (no dark: variants — the site is light-only,
- *    and those would turn the titles white on an OS in dark mode);
+ *  - colours use the site tokens, which flip with the site's own light/dark
+ *    switch (html[data-theme]), never with the OS setting;
  *  - square icon box (the brief allows no rounded corners), calmer type;
  *  - hover/expand only for mouse pointers (`pointer-fine:`). On touch
  *    screens there is no hover, so rows show their photo all the time.
@@ -91,8 +91,8 @@ function CinematicListItem({ id, title, meta, href, src, alt }: CinematicItem) {
               "flex h-10 w-10 items-center justify-center border transition-all duration-500",
               "border-white text-white", // touch: always on the photo
               "pointer-fine:border-line pointer-fine:text-muted",
-              "pointer-fine:group-hover:scale-110 pointer-fine:group-hover:border-white pointer-fine:group-hover:bg-white pointer-fine:group-hover:text-ink",
-              "pointer-fine:group-focus-visible:border-white pointer-fine:group-focus-visible:bg-white pointer-fine:group-focus-visible:text-ink",
+              "pointer-fine:group-hover:scale-110 pointer-fine:group-hover:border-white pointer-fine:group-hover:bg-white pointer-fine:group-hover:text-black",
+              "pointer-fine:group-focus-visible:border-white pointer-fine:group-focus-visible:bg-white pointer-fine:group-focus-visible:text-black",
             )}
           >
             <MoveRight aria-hidden="true" className="h-5 w-5 transition-transform duration-500 group-hover:-rotate-45" />

@@ -61,11 +61,13 @@ export function Projects() {
                     className={tall ? "h-[420px]" : "h-[260px]"}
                     imgClassName={zoom}
                   />
-                  {/* Title fades in over the photo on hover. */}
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-16 text-white opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 sm:p-6 sm:pt-20">
-                    <p className="label text-white/75">{projectMeta(project)}</p>
-                    <p className="mt-2 text-lg leading-tight sm:text-xl">{project.title}</p>
-                  </div>
+                  {/* Caption under the photo, always visible; the title underlines on hover. */}
+                  <span data-reveal className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                    <span className="text-base leading-tight sm:text-xl">
+                      <span className="link pb-1">{project.title}</span> →
+                    </span>
+                    <span className="label text-muted">{projectMeta(project)}</span>
+                  </span>
                 </Link>
               ))}
             </div>
@@ -83,11 +85,12 @@ export function Projects() {
                 Povucite crtu lijevo ili desno i usporedite prostor prije i nakon radova.
               </p>
             </div>
-            <div data-reveal className="mt-10">
+            {/* Narrower than the page on desktop so the slider doesn't swallow the screen. */}
+            <div data-reveal className="mx-auto mt-10 max-w-4xl">
               <BeforeAfter
                 before={FEATURED_COMPARISON.before}
                 after={FEATURED_COMPARISON.after}
-                width={2000}
+                width={1600}
                 className="aspect-square sm:aspect-[16/10]"
               />
               <Link
