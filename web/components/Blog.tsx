@@ -4,13 +4,15 @@ import type { CSSProperties } from "react";
 import { POSTS, formatDate } from "@/lib/content";
 
 import { Frame } from "./Frame";
+import { ReadMore } from "./ReadMore";
 import { SectionIntro } from "./SectionIntro";
 
 /** Posts in one row on desktop, a swipeable strip on phones and tablets. */
 export function Blog() {
   return (
     <section id="blog" className="bg-paper py-28 lg:py-40">
-      <div className="px-page">
+      {/* Title on the left, the link to every post on the right. */}
+      <div className="px-page flex flex-wrap items-end justify-between gap-6">
         <SectionIntro
           title={
             <>
@@ -19,6 +21,9 @@ export function Blog() {
           }
           text="Kratko i korisno — prije nego što krenete s radovima."
         />
+        <Link href="/blog" className="label link pb-1">
+          Svi članci →
+        </Link>
       </div>
 
       <ul className="px-page mt-16 flex snap-x snap-mandatory scroll-pl-6 gap-4 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] sm:scroll-pl-10 lg:mt-24 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:pb-0">
@@ -34,26 +39,18 @@ export function Blog() {
               />
               <div data-reveal style={{ "--rd": `${i * 90}ms` } as CSSProperties}>
                 <p className="label mt-5 text-muted">
-                  {post.category} · {post.readingTime}
+                  <time dateTime={post.date}>{formatDate(post.date)}</time>
                 </p>
                 <h3 className="mt-2 text-lg leading-snug tracking-tight">
                   <span className="link pb-0.5">{post.title}</span>
                 </h3>
-                <p className="label mt-3 text-muted">{formatDate(post.date)}</p>
+                <p className="mt-2 line-clamp-2 text-sm text-muted">{post.excerpt}</p>
+                <ReadMore />
               </div>
             </Link>
           </li>
         ))}
       </ul>
-
-      <div className="px-page mt-12 lg:mt-16">
-        <Link
-          href="/blog"
-          className="label inline-flex h-12 items-center border border-ink px-6 transition-colors duration-300 hover:bg-ink hover:text-paper"
-        >
-          <span className="dot">Svi članci</span>
-        </Link>
-      </div>
     </section>
   );
 }

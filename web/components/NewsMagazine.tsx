@@ -4,10 +4,11 @@ import type { CSSProperties } from "react";
 import { formatDate, type Article } from "@/lib/content";
 
 import { Frame } from "./Frame";
+import { ReadMore } from "./ReadMore";
 
 const zoom = "transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]";
 
-/** A row of news cards with the copy under the photo; colours follow the theme. */
+/** A row of news cards: photo, then date, title and description. Colours follow the theme. */
 export function NewsMagazine({ items }: { items: Article[] }) {
   const soft = "text-muted";
 
@@ -22,18 +23,13 @@ export function NewsMagazine({ items }: { items: Article[] }) {
           </span>
           <div data-reveal style={{ "--rd": `${i * 120 + 100}ms` } as CSSProperties}>
             <p className={`label mt-4 ${soft}`}>
-              {formatDate(item.date)} · {item.category}
+              <time dateTime={item.date}>{formatDate(item.date)}</time>
             </p>
             <h3 className="mt-3 text-xl leading-snug tracking-tight">
               <span className="link pb-0.5">{item.title}</span>
             </h3>
             <p className={`mt-2 line-clamp-2 text-sm ${soft}`}>{item.excerpt}</p>
-            <span className="label mt-5 inline-flex items-center gap-3">
-              Pročitaj
-              <span aria-hidden="true" className="transition-transform duration-500 group-hover:translate-x-1.5">
-                →
-              </span>
-            </span>
+            <ReadMore />
           </div>
         </Link>
       ))}

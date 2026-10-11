@@ -77,22 +77,9 @@ export function NewsPortal() {
           "--gp-foreground": "var(--foreground)",
         }}
         background={
-          <>
-            {/* Seen through the letters at first, then all around the news: a plain
-                field with one soft drifting glow, a fine grid and a touch of grain. */}
-            <div
-              className="zs-news-bg absolute inset-0 overflow-hidden"
-              style={{ transform: "scale(var(--gp-field-scale,1))" }}
-            >
-              <div className="zs-news-bg__shade absolute inset-0" />
-              <div className="zs-news-bg__light absolute inset-0">
-                <span className="zs-news-bg__blob zs-news-bg__blob--a" />
-              </div>
-              <div className="zs-news-bg__grid absolute inset-0" />
-              <div className="zs-news-bg__grain absolute inset-0" />
-            </div>
-            <Blueprint />
-          </>
+          /* A plain field in the theme's colour: the contrasting letter colour while it
+             shows through the word, turning into the page background as the news come in. */
+          <div className="zs-news-bg absolute inset-0" />
         }
         front={
           <>
@@ -115,24 +102,6 @@ export function NewsPortal() {
           </div>
         </div>
       </GlyphPortal>
-    </div>
-  );
-}
-
-/**
- * A folding-rule ruler down the right edge of the news, drawn in from the top
- * as the news come in — the one building-trade detail in the field.
- */
-function Blueprint() {
-  return (
-    <div className="zs-blueprint pointer-events-none absolute inset-0" aria-hidden="true">
-      <span className="zs-blueprint__ruler">
-        {Array.from({ length: 16 }, (_, i) => (
-          <span key={i} className="zs-blueprint__ruler-num" style={{ top: `${i * 80}px` }}>
-            {i * 10}
-          </span>
-        ))}
-      </span>
     </div>
   );
 }

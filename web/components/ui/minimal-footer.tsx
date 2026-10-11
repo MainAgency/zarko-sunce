@@ -28,12 +28,12 @@ export function MinimalFooter() {
         <div className="grid grid-cols-6 gap-x-6 gap-y-10 px-6 pb-14 pt-16 md:px-10">
           <div className="col-span-6 flex flex-col gap-6 md:col-span-3">
             <Link href="/" aria-label="Žarko Sunce — početna" className="w-max">
-              <Logo className="text-[30px]" />
+              <Logo className="text-[42px]" />
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-muted text-balance">
               Adaptacije stanova i završni radovi — od pregradnog zida do ključa u ruke.
             </p>
-            <ul className="flex gap-2">
+            <ul className="-ml-1 flex gap-3">
               {SOCIAL.map(({ href, label, Icon }) => (
                 <li key={href}>
                   <a
@@ -42,9 +42,9 @@ export function MinimalFooter() {
                     rel="noopener noreferrer"
                     aria-label={label}
                     title={label}
-                    className="grid size-9 place-content-center border border-line text-muted transition-colors duration-300 hover:border-ink hover:bg-ink hover:text-paper"
+                    className="grid size-10 place-content-center text-muted transition-[color,transform] duration-300 hover:-translate-y-0.5 hover:text-foreground"
                   >
-                    <Icon className="size-4" />
+                    <Icon className="size-6" />
                   </a>
                 </li>
               ))}

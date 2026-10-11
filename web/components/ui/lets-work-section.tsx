@@ -14,8 +14,9 @@ import { PHOTOS, photoUrl } from "@/lib/content";
  * Puzzle: a finished interior cut into real jigsaw pieces. They fly in from
  * scattered positions and click together as the section scrolls into view;
  * one piece — outlined in yellow, "your part" — waits beside its gap and
- * snaps in when the pointer is over the section (on touch, by itself once the
- * rest is done).
+ * snaps in once you scroll to the end of the section, or earlier when the
+ * pointer is over it; scrolling back up lifts it out and the board breaks apart
+ * again.
  */
 
 const COLS = 4;
@@ -101,11 +102,11 @@ export function LetsWorkTogether() {
   // the bottom of the screen, 1 once it reaches the upper quarter.
   useLayoutEffect(() => {
     const svg = board.current;
-    if (!svg) return;
+    const section = svg?.closest("section");
+    if (!svg || !section) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const touch = window.matchMedia("(pointer: coarse)").matches;
     let frame = 0;
-    let completeTimer: number | undefined;
+    let complete = false;
 
     const render = () => {
       frame = 0;
@@ -123,13 +124,15 @@ export function LetsWorkTogether() {
 
       const ready = p >= 0.98;
       svg.toggleAttribute("data-ready", ready);
-      if (!ready) {
-        window.clearTimeout(completeTimer);
-        completeTimer = undefined;
-        svg.removeAttribute("data-complete");
-      } else if (touch && completeTimer === undefined) {
-        completeTimer = window.setTimeout(() => svg.setAttribute("data-complete", ""), 900);
-      }
+
+      // The last piece clicks in once the section has been scrolled to its end
+      // (its bottom edge on screen), and comes back out on the way up — with a
+      // little slack so it does not flicker right at the edge.
+      const bottom = section.getBoundingClientRect().bottom;
+      if (!ready) complete = false;
+      else if (bottom <= vh + 2) complete = true;
+      else if (bottom > vh + 80) complete = false;
+      svg.toggleAttribute("data-complete", complete);
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(render);
@@ -140,7 +143,6 @@ export function LetsWorkTogether() {
     window.addEventListener("resize", schedule);
     return () => {
       cancelAnimationFrame(frame);
-      window.clearTimeout(completeTimer);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
@@ -181,9 +183,6 @@ export function LetsWorkTogether() {
               className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
             />
           </span>
-          <p data-reveal style={delay(260)} className="label mt-5 text-muted">
-            Besplatan izlazak na teren · bez obveze
-          </p>
         </div>
 
         <figure className="mx-auto w-full max-w-[26rem] lg:col-span-6 lg:col-start-7 lg:max-w-[30rem]">
@@ -241,7 +240,7 @@ export function LetsWorkTogether() {
               ),
             )}
 
-            {/* Your piece: waits beside the gap, snaps in on hover. */}
+            {/* Your piece: waits beside the gap, snaps in at the end of the section (or on hover). */}
             <g className="zs-puzzle__missing" style={{ transformOrigin: `${missing.cx}px ${missing.cy}px` }}>
               <g className="zs-puzzle__bob" style={{ transformOrigin: `${missing.cx}px ${missing.cy}px` }}>
                 <image

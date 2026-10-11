@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatDate, type Article } from "@/lib/content";
 
 import { Frame } from "./Frame";
+import { ReadMore } from "./ReadMore";
 
 type ArticleViewProps = {
   article: Article;
@@ -28,7 +29,7 @@ export function ArticleView({ article, section, sectionHref, basePath, more }: A
           </p>
           <div className="lg:col-span-8 lg:col-start-5">
             <p data-reveal className="label text-muted">
-              {article.category} · {formatDate(article.date)} · {article.readingTime} čitanja
+              <time dateTime={article.date}>{formatDate(article.date)}</time>
             </p>
             <h1 data-reveal className="heading mt-6 text-[clamp(2rem,4vw,3.5rem)]">
               {article.title}
@@ -74,6 +75,8 @@ export function ArticleView({ article, section, sectionHref, basePath, more }: A
                 <h3 className="mt-2 text-lg leading-snug tracking-tight">
                   <span className="link pb-0.5">{item.title}</span>
                 </h3>
+                <p className="mt-2 line-clamp-2 text-sm text-muted">{item.excerpt}</p>
+                <ReadMore />
               </Link>
             ))}
           </div>

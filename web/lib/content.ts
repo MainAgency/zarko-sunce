@@ -74,53 +74,6 @@ export const PHOTOS = {
   homeOffice: unsplash("1613575831056-0acd5da8f085", "Radni kutak u dnevnom boravku"),
 };
 
-/* ----------------------------------------------------------------- Hero */
-
-export type HeroSlide = {
-  label: string;
-  title: string;
-  /** Second title line. */
-  accent: string;
-  text: string;
-  cta: { href: string; label: string };
-  photo: Photo;
-};
-
-export const HERO_SLIDES: HeroSlide[] = [
-  {
-    label: "Adaptacije stanova",
-    title: "Prostor po mjeri",
-    accent: "vašeg života",
-    text: "Kompletne i djelomične adaptacije stanova i kuća — od plana do završnog sloja.",
-    cta: { href: "#usluge", label: "Usluge" },
-    photo: PHOTOS.livingGrey,
-  },
-  {
-    label: "Ključ u ruke",
-    title: "Od prve skice",
-    accent: "do useljenja",
-    text: "Preuzimamo cijeli projekt: koordinaciju, materijale i završno čišćenje.",
-    cta: { href: "#o-nama", label: "O nama" },
-    photo: PHOTOS.kitchen,
-  },
-  {
-    label: "Knauf i spušteni stropovi",
-    title: "Linije koje",
-    accent: "oblikuju prostor",
-    text: "Pregradni zidovi, obloge i stropovi s integriranom rasvjetom.",
-    cta: { href: "#projekti", label: "Projekti" },
-    photo: PHOTOS.hallSkylight,
-  },
-  {
-    label: "Gletanje i bojanje",
-    title: "Završni sloj",
-    accent: "koji se vidi",
-    text: "Precizno gletanje i bojanje — zidovi bez mane i pri bočnom svjetlu.",
-    cta: { href: "/kontakt", label: "Kontakt" },
-    photo: PHOTOS.bedroomLight,
-  },
-];
-
 /* ------------------------------------------------------------- Services */
 
 export type Service = {
@@ -172,12 +125,43 @@ export const SERVICES: Service[] = [
 /* ---------------------------------------------------------------- About */
 
 export const ABOUT = {
+  /** The large photo in the About section: our van on the Žnjan new-build site. */
+  photo: {
+    src: "/images/o-nama/ekipa-znjan.webp",
+    alt: "Žarko Sunce kombi ispred novogradnje na Žnjanu u Splitu",
+  } satisfies Photo,
+  /** The small photo over its corner: one of the team fitting ceiling profiles. */
+  detail: {
+    src: "/images/o-nama/majstor-strop.webp",
+    alt: "Majstor Žarko Sunca montira profile za spušteni strop",
+  } satisfies Photo,
   text: [
     "Žarko Sunce d.o.o. bavi se adaptacijama stanova i završnim radovima — suhomontažom, gletanjem, bojanjem i spuštenim stropovima.",
     "Radimo s jednom ekipom od početka do kraja. Rokovi se ne gube između različitih majstora, a vi imate jednu osobu za sve dogovore.",
   ],
-  values: ["Jedna ekipa", "Jasna ponuda", "Čisto radilište"],
 };
+
+/* ------------------------------------------------------------- Partners */
+
+// Partner logos live in /public/partneri/ (transparent PNG, trimmed). `width`
+// and `height` are the file's pixel size; `display` is the height the logo is
+// shown at, tuned per logo so wide and compact marks look the same weight.
+// Add `href` to make a logo link to the partner's site.
+export type Partner = {
+  name: string;
+  logo: string;
+  width: number;
+  height: number;
+  display: number;
+  href?: string;
+};
+
+export const PARTNERS: Partner[] = [
+  { name: "JUB", logo: "/partneri/jub.png", width: 361, height: 145, display: 34 },
+  { name: "Termodinamika", logo: "/partneri/termodinamika.png", width: 830, height: 97, display: 22 },
+  { name: "Knauf", logo: "/partneri/knauf.png", width: 270, height: 160, display: 38 },
+  { name: "Hilti", logo: "/partneri/hilti.png", width: 612, height: 160, display: 28 },
+];
 
 /* --------------------------------------------------------- Projects/news */
 

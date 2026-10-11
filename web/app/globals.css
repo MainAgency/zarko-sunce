@@ -244,7 +244,7 @@ em.accent {
    swaps to the top. */
 .zs-burger__line {
   display: block;
-  width: 28px;
+  width: 32px;
   height: 3px;
   margin-top: 5px;
   background: currentColor;
@@ -322,6 +322,34 @@ em.accent {
 }
 .zs-menu__item .zs-menu__line {
   position: relative;
+}
+
+/* ---------- Partners strip ---------- */
+
+/* Two copies side by side, shifted by one copy: an endless glide. */
+.zs-partners {
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+.zs-partners__track {
+  animation: zs-partners 24s linear infinite;
+}
+@keyframes zs-partners {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zs-partners {
+    mask-image: none;
+  }
+  .zs-partners__track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+  .zs-partners__track > ul[aria-hidden="true"] {
+    display: none;
+  }
 }
 
 /* ---------- Projects grid ---------- */
@@ -446,7 +474,7 @@ em.accent {
   }
 }
 
-/* Snaps in on hover or keyboard focus — on touch, by itself once ready. */
+/* Snaps in on hover or keyboard focus, and by itself at the end of the section (data-complete). */
 .group:hover .zs-puzzle[data-ready] .zs-puzzle__missing,
 .group:focus-visible .zs-puzzle[data-ready] .zs-puzzle__missing,
 .zs-puzzle[data-complete] .zs-puzzle__missing {
@@ -466,84 +494,33 @@ em.accent {
 
 /* ---------- Hero carousel ---------- */
 
-/* The next slide waits, whole, in a tile in the bottom-right corner; on its
-   turn the tile's frame grows to fill the screen. */
-.hero {
-  --tile-w: 7.5rem;
-  --tile-h: 5rem;
-  --tile-r: 1.5rem;
-  --tile-b: 1.5rem;
-  --tile-inset: calc(100% - var(--tile-b) - var(--tile-h)) var(--tile-r) var(--tile-b)
-    calc(100% - var(--tile-r) - var(--tile-w));
-}
-@media (min-width: 640px) {
-  .hero {
-    --tile-w: 13rem;
-    --tile-h: 8.5rem;
-    --tile-r: 2.5rem;
-    --tile-b: 2.5rem;
-  }
-}
-@media (min-width: 1024px) {
-  .hero {
-    --tile-w: 17rem;
-    --tile-h: 11rem;
-    --tile-r: 3.5rem;
-    --tile-b: 3.5rem;
-  }
-}
-.hero-tile {
-  position: absolute;
-  inset: var(--tile-inset);
-}
-.hero-tile-label {
-  position: absolute;
-  right: var(--tile-r);
-  bottom: calc(var(--tile-b) + var(--tile-h) + 1.25rem);
-  width: var(--tile-w);
-}
-
 .slide[data-state="active"] {
   z-index: 2;
 }
 .slide[data-state="prev"] {
   z-index: 1;
 }
-.slide[data-state="next"] {
-  z-index: 3;
+.slide[data-state="idle"] {
+  visibility: hidden;
 }
-.slide-frame {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
+/* Each slide enters over the one before in its own way; going back always
+   wipes in from the left. */
+.slide[data-enter="wipe"] {
+  animation: hero-enter-wipe 1.4s var(--ease-in-out) both;
 }
-.slide[data-state="next"] .slide-frame {
-  inset: var(--tile-inset);
-  animation: tile-in 1s var(--ease) 0.7s both;
+.slide[data-enter="back"] {
+  animation: hero-enter-back 1.4s var(--ease-in-out) both;
 }
-.slide[data-dir="tile"] .slide-frame {
-  animation: slide-from-tile 1.4s var(--ease-in-out) both;
+.slide[data-enter="circle"] {
+  animation: hero-enter-circle 1.6s var(--ease-in-out) both;
 }
-.slide[data-dir="left"] {
-  animation: slide-from-left 1.4s var(--ease-in-out) both;
+.slide[data-enter="diagonal"] {
+  animation: hero-enter-diagonal 1.5s var(--ease-in-out) both;
 }
-.slide[data-dir="right"] {
-  animation: slide-from-right 1.4s var(--ease-in-out) both;
+.slide[data-enter="blinds"] {
+  animation: hero-enter-blinds 1.5s var(--ease-in-out) both;
 }
-@keyframes slide-from-tile {
-  from {
-    inset: var(--tile-inset);
-  }
-}
-@keyframes slide-from-left {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0);
-  }
-}
-@keyframes slide-from-right {
+@keyframes hero-enter-wipe {
   from {
     clip-path: inset(0 0 0 100%);
   }
@@ -551,8 +528,7 @@ em.accent {
     clip-path: inset(0);
   }
 }
-/* A new next slide wipes into the tile once the growing one has left it. */
-@keyframes tile-in {
+@keyframes hero-enter-back {
   from {
     clip-path: inset(0 100% 0 0);
   }
@@ -560,22 +536,48 @@ em.accent {
     clip-path: inset(0);
   }
 }
+/* Opens as a circle from the right of centre, where the photo's subject usually sits. */
+@keyframes hero-enter-circle {
+  from {
+    clip-path: circle(0% at 68% 50%);
+  }
+  to {
+    clip-path: circle(150% at 68% 50%);
+  }
+}
+@keyframes hero-enter-diagonal {
+  from {
+    clip-path: polygon(100% 0, 100% 0, 100% 100%, 130% 100%);
+  }
+  to {
+    clip-path: polygon(-30% 0, 100% 0, 100% 100%, 0% 100%);
+  }
+}
+/* Blinds: eight vertical strips that each widen until they meet. */
+@property --hero-blind {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@keyframes hero-enter-blinds {
+  from {
+    --hero-blind: 0%;
+  }
+  to {
+    --hero-blind: 12.6%;
+  }
+}
+.slide[data-enter="blinds"] {
+  mask-image: repeating-linear-gradient(90deg, #000 0 var(--hero-blind), transparent var(--hero-blind) 12.5%);
+}
 
+/* The active photo settles slowly from a slight zoom. */
 .slide-photo {
   transform: scale(1.12);
   transition: transform 8s var(--ease);
 }
 .slide[data-state="active"] .slide-photo {
   transform: scale(1);
-}
-
-/* The tile shows its photo unshaded; the shade comes in as it grows. */
-.slide-shade {
-  transition: opacity 1.4s var(--ease-in-out);
-}
-.slide[data-state="next"] .slide-shade {
-  opacity: 0;
-  transition: none;
 }
 
 .caption {
@@ -601,20 +603,56 @@ em.accent {
   transition-delay: calc(450ms + var(--i, 0) * 90ms);
 }
 
-/* The line drawing itself around the tile is the slide timer. */
-.tile-progress {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+/* Before/after slide: the "before" photo covers the left part, its edge
+   (and the white line on it) sweeping slowly to and fro. */
+@property --hero-cut {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 55%;
 }
-.tile-progress[data-running="true"] {
-  animation: tile-progress var(--duration) linear forwards;
+.hero-compare {
+  animation: hero-compare 7s ease-in-out infinite alternate;
 }
-.tile-progress[data-paused="true"] {
+.hero-compare__before {
+  clip-path: inset(0 calc(100% - var(--hero-cut)) 0 0);
+}
+.hero-compare__line {
+  left: var(--hero-cut);
+}
+@keyframes hero-compare {
+  from {
+    --hero-cut: 30%;
+  }
+  to {
+    --hero-cut: 75%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-compare {
+    animation: none;
+  }
+}
+
+/* Progress segments: done ones full, upcoming ones empty, the active one fills
+   over the slide's time — its animation ending advances the carousel. */
+.hero-bar {
+  transform: scaleX(0);
+}
+.hero-bar[data-state="done"] {
+  transform: scaleX(1);
+}
+.hero-bar[data-state="active"][data-running="false"] {
+  transform: scaleX(1);
+}
+.hero-bar[data-state="active"][data-running="true"] {
+  animation: hero-bar var(--duration) linear forwards;
+}
+.hero-bar[data-paused="true"] {
   animation-play-state: paused;
 }
-@keyframes tile-progress {
+@keyframes hero-bar {
   to {
-    stroke-dashoffset: 0;
+    transform: scaleX(1);
   }
 }
 
@@ -661,136 +699,22 @@ em.accent {
 
 /* ---------- News portal background ---------- */
 
-/* The theme's own background (light or dark) with one soft touch of
-   yellow in a corner. The letters of the opening word show --news-letter
-   (black on light, near-white on dark); as the news come in (--gp-reveal
-   0 → 1) the field turns to --news-field, the grid firms up and the
-   drawing-sheet marks are drawn. */
-.zs-news-bg,
-.zs-blueprint {
-  --nb-yellow: rgb(252 216 3 / 0.24);
-  --nb-blend: multiply;
-  --nb-grid: rgb(18 18 18 / 0.06);
-  --nb-line: rgb(18 18 18 / 0.45);
-  --nb-text: rgb(18 18 18 / 0.55);
-  --nb-grain: 0.05;
-}
-:root[data-theme="dark"] .zs-news-bg,
-:root[data-theme="dark"] .zs-blueprint {
-  --nb-yellow: rgb(252 216 3 / 0.17);
-  --nb-blend: screen;
-  --nb-grid: rgb(255 255 255 / 0.06);
-  --nb-line: rgb(255 255 255 / 0.4);
-  --nb-text: rgb(255 255 255 / 0.55);
-  --nb-grain: 0.1;
-}
-.zs-news-bg__shade {
+/* A plain field: the letters of the opening word show --news-letter (black on
+   light, near-white on dark); as the news come in (--gp-reveal 0 → 1) it
+   turns into --news-field, the page's own background. */
+.zs-news-bg {
   background: color-mix(in srgb, var(--news-field) calc(var(--gp-reveal, 0) * 100%), var(--news-letter));
 }
-.zs-news-bg__light {
-  mix-blend-mode: var(--nb-blend);
-}
-.zs-news-bg__blob {
-  position: absolute;
-  border-radius: 50%;
-  will-change: transform;
-}
-/* One soft glow, drifting slowly in the upper corner. */
-.zs-news-bg__blob--a {
-  left: -12vmax;
-  top: -14vmax;
-  width: 52vmax;
-  height: 52vmax;
-  background: radial-gradient(closest-side, var(--nb-yellow), transparent);
-  animation: zs-drift-a 26s ease-in-out infinite alternate;
-}
-@keyframes zs-drift-a {
-  to {
-    transform: translate(10vw, 8vh) scale(1.1);
-  }
-}
-/* Architectural grid, fading out toward the edges, settling in as you enter. */
-.zs-news-bg__grid {
-  background-image:
-    linear-gradient(var(--nb-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--nb-grid) 1px, transparent 1px);
-  background-size: 88px 88px;
-  background-position: center;
-  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
-  opacity: calc(0.6 + var(--gp-reveal, 0) * 0.4);
-  transform: scale(calc(1.08 - var(--gp-reveal, 0) * 0.08));
-}
-.zs-news-bg__grain {
-  opacity: var(--nb-grain);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* The ruler layer: drawn in as the news come in. */
-.zs-blueprint {
-  --nb-inset: clamp(14px, 2.2vw, 32px);
-  opacity: var(--gp-reveal, 0);
-  color: var(--nb-text);
-}
-/* Ruler down the right edge, like a folding rule: a short tick every 8px,
-   a mid tick every 40px and a long, heavier tick every 80px with its number
-   to the left of it. Ticks grow inward from the edge. */
-.zs-blueprint__ruler {
-  position: absolute;
-  top: calc(var(--nb-inset) + 48px);
-  bottom: calc(var(--nb-inset) + 48px);
-  right: var(--nb-inset);
-  width: 56px;
-  overflow: hidden;
-  background:
-    repeating-linear-gradient(to bottom, var(--nb-line) 0 2px, transparent 2px 80px) right / 34px 100% no-repeat,
-    repeating-linear-gradient(to bottom, var(--nb-line) 0 1.5px, transparent 1.5px 40px) right / 22px 100% no-repeat,
-    repeating-linear-gradient(to bottom, var(--nb-line) 0 1px, transparent 1px 8px) right / 12px 100% no-repeat;
-  border-right: 2px solid var(--nb-line);
-  clip-path: inset(0 0 calc((1 - var(--gp-reveal, 0)) * 100%) 0);
-}
-.zs-blueprint__ruler-num {
-  position: absolute;
-  right: 40px;
-  margin-top: -6px;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 12px;
-  letter-spacing: 0.04em;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-.zs-blueprint__ruler-num:first-child {
-  margin-top: 0;
-}
-/* Narrower between phone and wide desktop, so it stays clear of the news column. */
-@media (min-width: 768px) and (max-width: 1279px) {
-  .zs-blueprint__ruler {
-    width: 36px;
-    background-size: 20px 100%, 13px 100%, 7px 100%;
-  }
-  .zs-blueprint__ruler-num {
-    right: 24px;
-    font-size: 9px;
-  }
-}
-@media (max-width: 767px) {
-  /* Phones: ticks only, kept clear of the news column. */
-  .zs-blueprint__ruler {
-    width: 14px;
-    background-size: 14px 100%, 9px 100%, 5px 100%;
-  }
-  .zs-blueprint__ruler-num {
-    display: none;
-  }
+/* Static portal (reduced motion, a background tab, a late font): no fly-through,
+   the word stays a poster above the news, so its letters keep the contrast colour. */
+[data-gp-motion="off"] .zs-news-bg {
+  background: var(--news-letter);
 }
 /* The news themselves rise into place as they fade in. */
 .zs-news-content {
   translate: 0 calc((1 - var(--gp-reveal, 1)) * 3rem);
 }
 @media (prefers-reduced-motion: reduce) {
-  .zs-news-bg__blob {
-    animation: none;
-  }
   .zs-news-content {
     translate: none;
   }

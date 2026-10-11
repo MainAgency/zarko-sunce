@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BeforeAfter } from "@/components/BeforeAfter";
 import { Frame } from "@/components/Frame";
 import { ProjectGallery } from "@/components/ProjectGallery";
-import { PROJECTS, SERVICES, projectMeta } from "@/lib/content";
+import { PROJECTS, SERVICES, photoUrl, projectMeta } from "@/lib/content";
 import { buildSeoMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -34,7 +36,8 @@ export default async function ProjectPage({ params }: Props) {
   const index = PROJECTS.findIndex((p) => p.slug === slug);
   if (index === -1) notFound();
   const project = PROJECTS[index];
-  const next = PROJECTS[(index + 1) % PROJECTS.length];
+  const nextIndex = (index + 1) % PROJECTS.length;
+  const next = PROJECTS[nextIndex];
   const services = SERVICES.filter((s) => project.services.includes(s.id));
 
   // Only the facts we actually have.
@@ -142,23 +145,58 @@ export default async function ProjectPage({ params }: Props) {
         )}
       </article>
 
+      {/* Next project: its cover full width, the title large over it. On hover the
+          photo eases in, the arrow square fills yellow, and the bar along the bottom
+          shows where the next project sits in the list. */}
       <Link
         href={`/projekti/${next.slug}`}
-        className="group px-page grid gap-8 border-t border-line py-20 lg:grid-cols-12"
+        className="group relative block h-[72svh] min-h-[28rem] overflow-hidden bg-black text-white"
       >
-        <span className="label text-muted lg:col-span-3 lg:pt-3">Sljedeći projekt</span>
-        <span className="lg:col-span-5 lg:col-start-5">
-          <span className="heading block text-[clamp(1.875rem,3.4vw,3rem)]">
-            <span className="link pb-1">{next.title}</span> →
-          </span>
-          <span className="label mt-4 block text-muted">{projectMeta(next)}</span>
-        </span>
-        <Frame
-          photo={next.cover}
-          width={900}
-          className="aspect-[4/3] lg:col-span-3 lg:col-start-10"
-          imgClassName="transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+        <Image
+          src={photoUrl(next.cover, 2000)}
+          alt=""
+          fill
+          sizes="100vw"
+          className="scale-110 object-cover opacity-80 transition-[transform,opacity] duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-100"
         />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/40" />
+
+        <div className="px-page relative flex h-full flex-col justify-between py-10 lg:py-14">
+          <div className="flex items-baseline justify-between gap-6 text-white/75">
+            <span className="text-lg">Sljedeći projekt</span>
+            <span className="tabular-nums">
+              {String(nextIndex + 1).padStart(2, "0")} / {String(PROJECTS.length).padStart(2, "0")}
+            </span>
+          </div>
+
+          <div className="flex items-end justify-between gap-8">
+            <div className="min-w-0">
+              <h2 className="heading text-[clamp(2.5rem,7vw,6.5rem)]">{next.title}</h2>
+              <p className="mt-5 text-white/70 sm:text-lg">{projectMeta(next)}</p>
+            </div>
+            <span
+              aria-hidden="true"
+              className="relative grid size-16 shrink-0 place-content-center overflow-hidden border border-white/40 transition-colors duration-500 group-hover:border-yellow group-hover:bg-yellow group-hover:text-black sm:size-24"
+            >
+              <ArrowRight
+                strokeWidth={1.25}
+                className="size-7 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-16 sm:size-9"
+              />
+              <ArrowRight
+                strokeWidth={1.25}
+                className="absolute inset-0 m-auto size-7 -translate-x-16 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 sm:size-9"
+              />
+            </span>
+          </div>
+        </div>
+
+        {/* Position of the next project among all of them. */}
+        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1 bg-white/15">
+          <span
+            className="absolute inset-y-0 left-0 bg-yellow"
+            style={{ width: `${((nextIndex + 1) / PROJECTS.length) * 100}%` }}
+          />
+        </span>
       </Link>
     </>
   );

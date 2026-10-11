@@ -4,9 +4,11 @@ import type { CSSProperties } from "react";
 
 import { formatDate, photoUrl, type Article } from "@/lib/content";
 
+import { ReadMore } from "./ReadMore";
+
 /**
- * Archive rows for the /novosti and /blog column — news or blog posts: date and category,
- * title, excerpt, thumbnail on the right. `basePath` is the article route.
+ * Archive rows for the /novosti and /blog column: date, title and description
+ * with the thumbnail on the right. `basePath` is the article route.
  */
 export function NewsList({ items, basePath = "/novosti" }: { items: Article[]; basePath?: string }) {
   return (
@@ -30,18 +32,13 @@ export function NewsList({ items, basePath = "/novosti" }: { items: Article[]; b
 
             <div className="transition-[padding] duration-500 group-hover:pl-4">
               <p className="label text-muted">
-                <time dateTime={item.date}>{formatDate(item.date)}</time> · {item.category}
+                <time dateTime={item.date}>{formatDate(item.date)}</time>
               </p>
               <h2 className="heading mt-3 text-[clamp(1.375rem,2.4vw,2.25rem)]">
                 <span className="link pb-1">{item.title}</span>
               </h2>
               <p className="mt-3 line-clamp-2 max-w-xl text-muted sm:text-[17px]">{item.excerpt}</p>
-              <span className="label mt-5 inline-flex items-center gap-3">
-                Pročitaj
-                <span aria-hidden="true" className="transition-transform duration-500 group-hover:translate-x-1.5">
-                  →
-                </span>
-              </span>
+              <ReadMore />
             </div>
 
             <div className="relative aspect-[4/3] overflow-hidden bg-ink/5 sm:aspect-[5/4]">

@@ -121,8 +121,8 @@ export function Header() {
               aria-label="Žarko Sunce — početna"
               tabIndex={open ? -1 : 0}
               onClick={close}
-              className={`${tile} flex h-14 items-center overflow-hidden whitespace-nowrap transition-[max-width,padding,margin,visibility] ${EASE} hover:bg-tile/70 ${
-                open ? "invisible mr-0 max-w-0 px-0" : "visible mr-1 max-w-64 px-6"
+              className={`${tile} flex h-16 items-center overflow-hidden whitespace-nowrap transition-[max-width,padding,margin,visibility] ${EASE} hover:bg-tile/70 ${
+                open ? "invisible mr-0 max-w-0 px-0" : "visible mr-1 max-w-80 px-7"
               }`}
               style={{
                 transitionDuration: `${T.tileFold}ms`,
@@ -136,7 +136,7 @@ export function Header() {
                   transitionDelay: open ? "0ms" : `${T.closeLogoStart}ms`,
                 }}
               >
-                <Logo className="text-[22px]" />
+                <Logo className="text-[36px]" />
               </span>
             </Link>
             <button
@@ -145,7 +145,7 @@ export function Header() {
               aria-expanded={open}
               aria-controls="izbornik"
               aria-label={open ? "Zatvori izbornik" : "Otvori izbornik"}
-              className={`${tile} zs-burger grid h-14 w-14 place-content-center hover:bg-tile/70${open ? " is-open" : ""}`}
+              className={`${tile} zs-burger grid h-16 w-16 place-content-center hover:bg-tile/70${open ? " is-open" : ""}`}
             >
               <span className="zs-burger__line zs-burger__line--top" />
               <span className="zs-burger__line zs-burger__line--middle" />
@@ -229,7 +229,7 @@ export function Header() {
                       title={label}
                       className="block py-0.5 transition-colors duration-300 hover:text-foreground"
                     >
-                      <Icon className="size-5" />
+                      <Icon className="size-6" />
                     </a>
                   </li>
                 ))}
