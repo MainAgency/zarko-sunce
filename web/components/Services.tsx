@@ -13,8 +13,13 @@ const N = ITEMS.length;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
-/** Share of the remaining distance the row covers each frame — the glide behind the scroll. */
+/** Share of the remaining distance the row covers each frame — the glide behind the scroll.
+ *  Touch scrolling already has its own momentum, so phones follow more closely. */
 const GLIDE = 0.1;
+const GLIDE_TOUCH = 0.22;
+/** How far past the half-way point the row must go before the text switches service,
+ *  so it does not flip back and forth when scrolling stops near a boundary. */
+const HYSTERESIS = 0.12;
 
 /*
  * Services, after santalarch.com: a dark band that pins to the screen while
@@ -41,23 +46,31 @@ export function Services() {
     const st = stage.current;
     if (!el || !st) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const glide = window.matchMedia("(pointer: coarse)").matches ? GLIDE_TOUCH : GLIDE;
     let frame = 0;
     let x: number | null = null; // shown position; null until the first frame
+    let shown = 0; // service whose text is on screen
 
+    // Measured against the pinned stage (100svh), not window.innerHeight: on phones
+    // innerHeight jumps as the address bar hides and shows, which made the row jump.
     const target = () => {
       const rect = el.getBoundingClientRect();
-      const travel = rect.height - window.innerHeight;
+      const travel = rect.height - st.offsetHeight;
       return -1 + clamp(-rect.top / travel, 0, 1) * N; // -1 … N-1
     };
 
     const render = () => {
       frame = 0;
       const goal = target();
-      x = x === null || reduce ? goal : x + (goal - x) * GLIDE;
+      x = x === null || reduce ? goal : x + (goal - x) * glide;
       if (Math.abs(goal - x) < 0.0005) x = goal;
       st.style.setProperty("--x", x.toFixed(4));
       st.style.setProperty("--intro", clamp(x + 1, 0, 1).toFixed(4));
-      setActive(clamp(Math.round(x), 0, N - 1));
+      // Switch the text only once the row is clearly past the half-way point.
+      if (x > shown + 0.5 + HYSTERESIS || x < shown - 0.5 - HYSTERESIS) {
+        shown = clamp(Math.round(x), 0, N - 1);
+        setActive(shown);
+      }
       // Keep gliding until the row has caught up with the scroll.
       if (x !== goal) frame = requestAnimationFrame(render);
     };
@@ -140,6 +153,8 @@ export function Services() {
                   src={photoUrl(s.photo, 900)}
                   alt={s.photo.alt}
                   fill
+                  // Only five photos: load them up front so none pops in mid-slide.
+                  loading="eager"
                   sizes="(min-width: 768px) 25vw, 84vw"
                   className="object-cover"
                 />

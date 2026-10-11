@@ -36,25 +36,14 @@ const SOCIAL = [
   { href: CONTACT.facebook, label: "Facebook", Icon: FacebookIcon },
 ];
 
-/*
- * Opening choreography (ms): the logo slides up out of its tile, the tile folds
- * shut so the menu button glides to the centre, then the card unfolds under it
- * and its lines rise one after another. Closing runs the same steps backwards.
- */
-const T = {
-  logoFade: 320,
-  tileFold: 520,
-  foldStart: 180, // tile starts folding while the logo is still fading
-  cardStart: 480, // card appears as the fold settles
-  lineStart: 560,
-  closeCard: 320,
-  closeFoldStart: 120,
-  closeLogoStart: 420,
-};
+/* Lines inside the card rise in order once the card has started unfolding (ms). */
+const LINE_START = 220;
+const LINE_STEP = 35;
 
 /**
  * Centred, floating header: a logo tile and a square menu tile side by side.
- * The menu is a frosted card in the theme's tint (after fluid.glass): the big
+ * The menu is a frosted card that unfolds downward from under the tiles (the
+ * lines fold into an X, the page dims): the big
  * links sit on the left with a marker on the current page, contact and social
  * links follow in two small columns, the quote button and the theme switch
  * close the card. The page dims behind it.
@@ -97,7 +86,8 @@ export function Header() {
 
   const tab = open ? 0 : -1;
   /** Stagger for the card's masked lines, top to bottom, after the card has unfolded. */
-  const line = (i: number): CSSProperties => ({ "--d": open ? `${T.lineStart + i * 45}ms` : "0ms" }) as CSSProperties;
+  const line = (i: number): CSSProperties =>
+    ({ "--d": open ? `${LINE_START + i * LINE_STEP}ms` : "0ms" }) as CSSProperties;
   // Lines reveal in order: title, links, the two small columns, then the button row.
   const subStart = 1 + MENU.length;
   const buttonIndex = subStart + CONTACTS.length;
@@ -107,7 +97,7 @@ export function Header() {
       {/* Dims the page while the menu is open; any click on it closes the menu. */}
       <div
         aria-hidden="true"
-        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-700 ${EASE} ${
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-500 ${EASE} ${
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
@@ -115,29 +105,13 @@ export function Header() {
       <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex transform-gpu justify-center px-4">
         <div ref={ref} className="pointer-events-auto relative text-foreground">
           <div className="flex">
-            {/* Logo tile: the logo slides up, then the tile folds shut, leaving the menu button alone. */}
             <Link
               href="/"
               aria-label="Žarko Sunce — početna"
-              tabIndex={open ? -1 : 0}
               onClick={close}
-              className={`${tile} flex h-16 items-center overflow-hidden whitespace-nowrap transition-[max-width,padding,margin,visibility] ${EASE} hover:bg-tile/70 ${
-                open ? "invisible mr-0 max-w-0 px-0" : "visible mr-1 max-w-80 px-7"
-              }`}
-              style={{
-                transitionDuration: `${T.tileFold}ms`,
-                transitionDelay: open ? `${T.foldStart}ms` : `${T.closeFoldStart}ms`,
-              }}
+              className={`${tile} mr-1 flex h-16 items-center px-7 hover:bg-tile/70`}
             >
-              <span
-                className={`block transition-[opacity,translate] ${EASE} ${open ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}`}
-                style={{
-                  transitionDuration: open ? `${T.logoFade}ms` : "500ms",
-                  transitionDelay: open ? "0ms" : `${T.closeLogoStart}ms`,
-                }}
-              >
-                <Logo className="text-[36px]" />
-              </span>
+              <Logo className="text-[36px]" />
             </Link>
             <button
               type="button"
@@ -156,13 +130,9 @@ export function Header() {
           <nav
             id="izbornik"
             aria-label="Glavna navigacija"
-            className={`zs-menu absolute left-1/2 top-full mt-1 w-[min(calc(100vw-2rem),26rem)] origin-top -translate-x-1/2 bg-tile/70 p-[clamp(1.75rem,3.75vw,3.25rem)] text-foreground backdrop-blur-2xl backdrop-saturate-150 transition-[opacity,transform,visibility] ${EASE} ${
-              open ? "is-open visible scale-100 opacity-100" : "invisible scale-[0.96] opacity-0"
+            className={`zs-menu absolute left-1/2 top-full mt-1 w-[min(calc(100vw-2rem),26rem)] -translate-x-1/2 transform-gpu bg-tile/70 p-[clamp(1.75rem,3.75vw,3.25rem)] text-foreground backdrop-blur-2xl backdrop-saturate-150${
+              open ? " is-open" : ""
             }`}
-            style={{
-              transitionDuration: open ? "600ms" : `${T.closeCard}ms`,
-              transitionDelay: open ? `${T.cardStart}ms` : "0ms",
-            }}
           >
             <p className="zs-menu__mask label mb-4 text-[10px] text-muted">
               <span className="zs-menu__line" style={line(0)}>

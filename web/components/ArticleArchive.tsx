@@ -19,7 +19,7 @@ export function ArticleArchive({ title, text, items, basePath }: ArticleArchiveP
     <section className="px-page pb-28 pt-36 lg:pt-44">
       {/* One centred column, about two thirds of the page on large screens. */}
       <div className="mx-auto w-full max-w-3xl lg:w-2/3 lg:max-w-5xl">
-        <h1 data-reveal className="heading text-[clamp(2.5rem,5vw,4.5rem)]">
+        <h1 data-reveal className="heading text-[clamp(3rem,6.5vw,6rem)]">
           {title}
         </h1>
         <p data-reveal style={{ "--rd": "160ms" } as CSSProperties} className="mt-5 max-w-xl text-lg text-muted">

@@ -49,7 +49,7 @@ type Ink = { x: number; y: number; radius: number; index: number };
 type Letter = { index: number; x: number; y: number; width: number; height: number };
 
 /** Largest opaque square, in linear time. Unlike a stem guess, it works in O, S and Ø. */
-function interior(context: CanvasRenderingContext2D, char: string, font: string): Omit<Ink, "index"> | null {
+export function interior(context: CanvasRenderingContext2D, char: string, font: string): Omit<Ink, "index"> | null {
   const canvas = context.canvas;
   context.font = font;
   const m = context.measureText(char);

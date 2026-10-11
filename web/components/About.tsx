@@ -24,7 +24,7 @@ export function About() {
             level with the small photo on the left. */}
         <div className="flex min-w-0 flex-col lg:col-span-5 lg:col-start-8 lg:justify-between lg:py-[8%]">
           <div>
-            <h2 data-reveal className="heading text-[clamp(1.875rem,3.2vw,2.75rem)]">
+            <h2 data-reveal className="heading text-[clamp(2.25rem,4vw,3.5rem)]">
               Svaki detalj <em>na svom mjestu.</em>
             </h2>
             <div data-reveal style={{ "--rd": "160ms" } as CSSProperties} className="mt-8 space-y-4 text-muted">
@@ -35,7 +35,7 @@ export function About() {
           </div>
 
           <div className="mt-16 lg:mt-12">
-            <h3 data-reveal className="heading text-[clamp(1.375rem,2vw,1.75rem)]">
+            <h3 data-reveal className="heading text-[clamp(1.5rem,2.2vw,2rem)]">
               Partneri
             </h3>
             <div data-reveal style={{ "--rd": "120ms" } as CSSProperties} className="mt-6 border-y border-line py-5">

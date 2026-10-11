@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { PROJECTS, projectMeta } from "@/lib/content";
@@ -30,13 +31,27 @@ export function Projects() {
         {/* Before/after slider: drag the divider to compare the space before and after the work. */}
         {FEATURED_COMPARISON && (
           <div className="mt-20 lg:mt-28">
-            <div className="grid gap-4 lg:grid-cols-12">
-              <h3 data-reveal className="heading text-[clamp(1.75rem,3vw,2.5rem)] lg:col-span-4">
-                Prije ↔ poslije
-              </h3>
-              <p data-reveal className="max-w-md text-muted lg:col-span-7 lg:col-start-6 lg:pt-2">
-                Povucite crtu lijevo ili desno i usporedite prostor prije i nakon radova.
-              </p>
+            {/* Heading left, the link to every comparison top right (like the blog's "Svi članci"). */}
+            <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+              <div className="grid gap-4 lg:grid-cols-12">
+                <h3 data-reveal className="heading text-[clamp(2rem,3.4vw,3rem)] lg:col-span-4">
+                  Prije ↔ poslije
+                </h3>
+                <p data-reveal className="max-w-md text-muted lg:col-span-7 lg:col-start-6 lg:pt-2">
+                  Povucite crtu lijevo ili desno i usporedite prostor prije i nakon radova.
+                </p>
+              </div>
+              <Link
+                href="/prije-i-poslije"
+                className="label group inline-flex h-12 items-center gap-3 border border-ink px-6 transition-colors duration-300 hover:bg-ink hover:text-paper"
+              >
+                Sve usporedbe prije ↔ poslije
+                <ArrowRight
+                  aria-hidden="true"
+                  strokeWidth={1.5}
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </Link>
             </div>
             {/* Narrower than the page on desktop so the slider doesn't swallow the screen. */}
             <div data-reveal className="mx-auto mt-10 max-w-4xl">
@@ -54,9 +69,6 @@ export function Projects() {
                   <span className="link pb-1">{FEATURED_COMPARISON.project.title}</span> →
                 </span>
                 <span className="label text-muted">{projectMeta(FEATURED_COMPARISON.project)}</span>
-              </Link>
-              <Link href="/prije-i-poslije" className="label link mt-8 inline-block pb-1">
-                Sve usporedbe prije ↔ poslije
               </Link>
             </div>
           </div>

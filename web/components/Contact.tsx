@@ -12,13 +12,6 @@ const KINDS: [Kind, string][] = [
   ["business", "Tvrtke"],
 ];
 
-const BUDGETS = ["Do 10.000 €", "10.000 – 30.000 €", "30.000 – 60.000 €", "Više od 60.000 €"];
-const SPACES: Record<Kind, string[]> = {
-  person: ["Stan", "Kuća", "Vikendica / apartman", "Ostalo"],
-  business: ["Ured", "Trgovina / ugostiteljstvo", "Stambena zgrada", "Ostalo"],
-};
-const SIZES = ["Do 50 m²", "50 – 100 m²", "100 – 200 m²", "Više od 200 m²"];
-const STARTS = ["Što prije", "U sljedeća 3 mjeseca", "Kasnije"];
 const WORKS = SERVICES.map((s) => s.title);
 
 /** Staggered rise-in: `--d` is the item's place in the sequence. */
@@ -112,12 +105,7 @@ export function Contact({ initialServices = [] }: { initialServices?: ServiceId[
     const get = (key: string) => String(data.get(key) ?? "").trim();
     const details = [
       ["Kontakt osoba", get("contact")],
-      ["Lokacija", get("location")],
       ["Vrsta radova", get("work")],
-      ["Okvirni budžet", get("budget")],
-      [kind === "business" ? "Vrsta objekta" : "Vrsta prostora", get("space")],
-      ["Kvadratura", get("size")],
-      ["Početak radova", get("start")],
     ].filter(([, value]) => value);
     const message = [...details.map(([label, value]) => `${label}: ${value}`), "", get("note") || "(bez poruke)"].join("\n");
 
@@ -244,33 +232,12 @@ export function Contact({ initialServices = [] }: { initialServices?: ServiceId[
           <div className="cm-in" style={delay(d++)}>
             <input name="email" type="email" required defaultValue={draft.email} aria-label="E-mail" placeholder="E-mail*" autoComplete="email" className="cm-field" />
           </div>
-          <div className="cm-row cm-in" style={delay(d++)}>
+          <div className="cm-in" style={delay(d++)}>
             <input name="phone" type="tel" required defaultValue={draft.phone} aria-label="Telefon" placeholder="Telefon*" autoComplete="tel" className="cm-field" />
-            <input name="location" defaultValue={draft.location} aria-label="Grad ili mjesto" placeholder="Grad / mjesto" autoComplete="address-level2" className="cm-field" />
           </div>
-          {business ? (
-            <>
-              <div className="cm-row cm-in" style={delay(d++)}>
-                <Select name="space" placeholder="Vrsta objekta" options={SPACES.business} value={draft.space} />
-                <Select name="work" placeholder="Vrsta radova" options={WORKS} value={draft.work} />
-              </div>
-              <div className="cm-row cm-in" style={delay(d++)}>
-                <Select name="size" placeholder="Okvirna kvadratura" options={SIZES} value={draft.size} />
-                <Select name="start" placeholder="Početak radova" options={STARTS} value={draft.start} />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="cm-row cm-in" style={delay(d++)}>
-                <Select name="budget" placeholder="Okvirni budžet" options={BUDGETS} value={draft.budget} />
-                <Select name="work" placeholder="Vrsta radova" options={WORKS} value={draft.work} />
-              </div>
-              <div className="cm-row cm-in" style={delay(d++)}>
-                <Select name="space" placeholder="Vrsta prostora" options={SPACES.person} value={draft.space} />
-                <Select name="start" placeholder="Početak radova" options={STARTS} value={draft.start} />
-              </div>
-            </>
-          )}
+          <div className="cm-in" style={delay(d++)}>
+            <Select name="work" placeholder="Vrsta radova" options={WORKS} value={draft.work} />
+          </div>
           <div className="cm-in" style={delay(d++)}>
             <textarea name="note" defaultValue={draft.note} aria-label="Poruka" placeholder="Poruka" className="cm-field" />
           </div>

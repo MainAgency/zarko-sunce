@@ -17,11 +17,18 @@ import { PHOTOS, photoUrl } from "@/lib/content";
  * snaps in once you scroll to the end of the section, or earlier when the
  * pointer is over it; scrolling back up lifts it out and the board breaks apart
  * again.
+ *
+ * Each piece is an HTML layer (the photo as its background, cut with
+ * clip-path) moved with transforms, so phones composite the animation instead
+ * of repainting one big SVG every frame. The board is laid out in fixed units
+ * and scaled to the figure's width.
  */
 
 const COLS = 4;
 const ROWS = 5;
-const S = 100; // piece size in SVG units
+const S = 100; // piece size in board units
+/** How far a knob reaches past the piece's square, plus a little room for the stroke. */
+const REACH = 0.22 * S + 3;
 const W = COLS * S;
 const H = ROWS * S;
 const MISSING = 2 * COLS + 2; // row 3, column 3
@@ -36,7 +43,22 @@ function rng(seed: number) {
   };
 }
 
-type Piece = { path: string; cx: number; cy: number; sx: number; sy: number; rot: number; delay: number };
+type Piece = {
+  /** Outline in board units (for the gap drawn on the board). */
+  path: string;
+  /** The same outline relative to the piece's own box (for its clip and stroke). */
+  local: string;
+  /** The piece's box on the board: its square plus the knobs' reach. */
+  bx: number;
+  by: number;
+  size: number;
+  cx: number;
+  cy: number;
+  sx: number;
+  sy: number;
+  rot: number;
+  delay: number;
+};
 
 /**
  * Cuts the board. Each inner edge gets a knob that bulges one way; the knob
@@ -49,11 +71,21 @@ function cut(): Piece[] {
   const vEdge = Array.from({ length: ROWS }, () => Array.from({ length: COLS + 1 }, sign));
   const f = (n: number) => +n.toFixed(2);
 
-  const edge = (ax: number, ay: number, bx: number, by: number, bulgeX: number, bulgeY: number) => {
-    if (!bulgeX && !bulgeY) return `L${bx} ${by}`;
+  // One edge of the outline; `ox`/`oy` shift the coordinates into a local box.
+  const edge = (
+    ax: number,
+    ay: number,
+    bx: number,
+    by: number,
+    bulgeX: number,
+    bulgeY: number,
+    ox: number,
+    oy: number,
+  ) => {
+    if (!bulgeX && !bulgeY) return `L${f(bx - ox)} ${f(by - oy)}`;
     const p = (t: number, h: number) =>
-      `${f(ax + (bx - ax) * t + bulgeX * h * S)} ${f(ay + (by - ay) * t + bulgeY * h * S)}`;
-    return `L${p(0.35, 0)}C${p(0.42, 0.02)} ${p(0.3, 0.22)} ${p(0.5, 0.22)}C${p(0.7, 0.22)} ${p(0.58, 0.02)} ${p(0.65, 0)}L${bx} ${by}`;
+      `${f(ax + (bx - ax) * t + bulgeX * h * S - ox)} ${f(ay + (by - ay) * t + bulgeY * h * S - oy)}`;
+    return `L${p(0.35, 0)}C${p(0.42, 0.02)} ${p(0.3, 0.22)} ${p(0.5, 0.22)}C${p(0.7, 0.22)} ${p(0.58, 0.02)} ${p(0.65, 0)}L${f(bx - ox)} ${f(by - oy)}`;
   };
 
   const pieces: Piece[] = [];
@@ -61,13 +93,15 @@ function cut(): Piece[] {
     for (let c = 0; c < COLS; c++) {
       const x = c * S;
       const y = r * S;
-      const path =
-        `M${x} ${y}` +
-        edge(x, y, x + S, y, 0, r > 0 ? hEdge[r][c] : 0) +
-        edge(x + S, y, x + S, y + S, c < COLS - 1 ? vEdge[r][c + 1] : 0, 0) +
-        edge(x + S, y + S, x, y + S, 0, r < ROWS - 1 ? hEdge[r + 1][c] : 0) +
-        edge(x, y + S, x, y, c > 0 ? vEdge[r][c] : 0, 0) +
+      const outline = (ox: number, oy: number) =>
+        `M${f(x - ox)} ${f(y - oy)}` +
+        edge(x, y, x + S, y, 0, r > 0 ? hEdge[r][c] : 0, ox, oy) +
+        edge(x + S, y, x + S, y + S, c < COLS - 1 ? vEdge[r][c + 1] : 0, 0, ox, oy) +
+        edge(x + S, y + S, x, y + S, 0, r < ROWS - 1 ? hEdge[r + 1][c] : 0, ox, oy) +
+        edge(x, y + S, x, y, c > 0 ? vEdge[r][c] : 0, 0, ox, oy) +
         "Z";
+      const bx = x - REACH;
+      const by = y - REACH;
       const cx = x + S / 2;
       const cy = y + S / 2;
       // Scatter outward from the middle of the board, with some jitter.
@@ -76,7 +110,11 @@ function cut(): Piece[] {
       const len = Math.hypot(dx, dy) || 1;
       const mag = 140 + rand() * 170;
       pieces.push({
-        path,
+        path: outline(0, 0),
+        local: outline(bx, by),
+        bx,
+        by,
+        size: S + 2 * REACH,
         cx,
         cy,
         sx: (dx / len) * mag + (rand() - 0.5) * 90,
@@ -90,27 +128,49 @@ function cut(): Piece[] {
 }
 
 const PIECES = cut();
-const IMAGE = photoUrl(PHOTOS.livingWindow, 1000);
+/** The photo cropped to the board's 4:5, so a plain W×H background lines up on every piece. */
+const IMAGE = `${photoUrl(PHOTOS.livingWindow, 1000)}&h=${Math.round((1000 * H) / W)}`;
+/** Shared by every piece: the whole photo as background, offset so this box shows its part. */
+const pieceStyle = (piece: Piece): CSSProperties => ({
+  left: piece.bx,
+  top: piece.by,
+  width: piece.size,
+  height: piece.size,
+  clipPath: `path("${piece.local}")`,
+  backgroundImage: `url("${IMAGE}")`,
+  backgroundSize: `${W}px ${H}px`,
+  backgroundPosition: `${-piece.bx}px ${-piece.by}px`,
+});
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 const delay = (ms: number) => ({ "--rd": `${ms}ms` }) as CSSProperties;
 
 export function LetsWorkTogether() {
-  const board = useRef<SVGSVGElement>(null);
-  const pieces = useRef<(SVGGElement | null)[]>([]);
+  const figure = useRef<HTMLElement>(null);
+  const board = useRef<HTMLDivElement>(null);
+  const probe = useRef<HTMLSpanElement>(null);
+  const pieces = useRef<(HTMLDivElement | null)[]>([]);
 
   // Drives the assembly from scroll position: 0 when the board's top enters
   // the bottom of the screen, 1 once it reaches the upper quarter.
   useLayoutEffect(() => {
     const svg = board.current;
+    const fig = figure.current;
     const section = svg?.closest("section");
-    if (!svg || !section) return;
+    if (!svg || !fig || !section) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let frame = 0;
     let complete = false;
 
+    // The board is laid out in W×H units and scaled to the figure's width.
+    const fit = () => fig.style.setProperty("--s", String(fig.clientWidth / W));
+    fit();
+    const sizer = new ResizeObserver(fit);
+    sizer.observe(fig);
+
     const render = () => {
       frame = 0;
-      const vh = window.innerHeight;
+      // A 100svh probe: window.innerHeight jumps on phones as the address bar hides.
+      const vh = probe.current?.offsetHeight || window.innerHeight;
       const p = reduce ? 1 : clamp01((vh - svg.getBoundingClientRect().top) / (vh * 0.75));
       PIECES.forEach((piece, i) => {
         const el = pieces.current[i];
@@ -143,6 +203,7 @@ export function LetsWorkTogether() {
     window.addEventListener("resize", schedule);
     return () => {
       cancelAnimationFrame(frame);
+      sizer.disconnect();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
@@ -185,82 +246,89 @@ export function LetsWorkTogether() {
           </span>
         </div>
 
-        <figure className="mx-auto w-full max-w-[26rem] lg:col-span-6 lg:col-start-7 lg:max-w-[30rem]">
-          <svg
+        <figure
+          ref={figure}
+          className="relative mx-auto aspect-[4/5] w-full max-w-[26rem] lg:col-span-6 lg:col-start-7 lg:max-w-[30rem]"
+          style={{ "--s": 1 } as CSSProperties}
+        >
+          <span
+            ref={probe}
+            aria-hidden="true"
+            className="pointer-events-none invisible absolute left-0 top-0 h-svh w-0"
+          />
+          <div
             ref={board}
-            viewBox={`0 0 ${W} ${H}`}
-            className="zs-puzzle block h-auto w-full overflow-visible"
             role="img"
             aria-label="Fotografija uređenog interijera složena od puzzle komadića"
+            className="zs-puzzle absolute left-0 top-0 origin-top-left"
+            style={{ width: W, height: H, scale: "var(--s)" }}
           >
-            <defs>
-              {PIECES.map((piece, i) => (
-                <clipPath key={i} id={`zs-piece-${i}`}>
-                  <path d={piece.path} />
-                </clipPath>
-              ))}
-            </defs>
-
             {/* The gap your piece fills. */}
-            <path
-              d={missing.path}
-              className="zs-puzzle__hole"
-              fill="color-mix(in srgb, var(--foreground) 6%, transparent)"
-              stroke="var(--muted)"
-              strokeWidth={1}
-              strokeDasharray="4 4"
-              vectorEffect="non-scaling-stroke"
-            />
+            <svg
+              aria-hidden="true"
+              viewBox={`0 0 ${missing.size} ${missing.size}`}
+              className="zs-puzzle__hole absolute overflow-visible"
+              style={{ left: missing.bx, top: missing.by, width: missing.size, height: missing.size }}
+            >
+              <path
+                d={missing.local}
+                fill="color-mix(in srgb, var(--foreground) 6%, transparent)"
+                stroke="var(--muted)"
+                strokeWidth={1}
+                strokeDasharray="4 4"
+              />
+            </svg>
 
             {PIECES.map((piece, i) =>
               i === MISSING ? null : (
-                <g
+                <div
                   key={i}
                   ref={(el) => {
                     pieces.current[i] = el;
                   }}
-                  className="zs-puzzle__piece"
-                  style={{ transformOrigin: `${piece.cx}px ${piece.cy}px` }}
+                  className="zs-puzzle__piece absolute"
+                  style={{ ...pieceStyle(piece), transformOrigin: `${piece.cx - piece.bx}px ${piece.cy - piece.by}px` }}
                 >
-                  <image
-                    href={IMAGE}
-                    width={W}
-                    height={H}
-                    preserveAspectRatio="xMidYMid slice"
-                    clipPath={`url(#zs-piece-${i})`}
-                  />
-                  <path
-                    d={piece.path}
-                    fill="none"
-                    stroke="rgb(255 255 255 / 0.4)"
-                    strokeWidth={0.75}
-                    vectorEffect="non-scaling-stroke"
-                  />
-                </g>
+                  <svg
+                    aria-hidden="true"
+                    viewBox={`0 0 ${piece.size} ${piece.size}`}
+                    className="absolute inset-0 overflow-visible"
+                  >
+                    <path d={piece.local} fill="none" stroke="rgb(255 255 255 / 0.4)" strokeWidth={0.75} />
+                  </svg>
+                </div>
               ),
             )}
 
             {/* Your piece: waits beside the gap, snaps in at the end of the section (or on hover). */}
-            <g className="zs-puzzle__missing" style={{ transformOrigin: `${missing.cx}px ${missing.cy}px` }}>
-              <g className="zs-puzzle__bob" style={{ transformOrigin: `${missing.cx}px ${missing.cy}px` }}>
-                <image
-                  href={IMAGE}
-                  width={W}
-                  height={H}
-                  preserveAspectRatio="xMidYMid slice"
-                  clipPath={`url(#zs-piece-${MISSING})`}
-                />
-                <path
-                  d={missing.path}
-                  fill="none"
-                  stroke="var(--yellow)"
-                  strokeWidth={2.5}
-                  vectorEffect="non-scaling-stroke"
-                />
-              </g>
-            </g>
-          </svg>
-          <figcaption className="label dot mt-8 text-muted">Nedostaje još samo vaš dio</figcaption>
+            <div
+              className="zs-puzzle__missing absolute"
+              style={{
+                left: missing.bx,
+                top: missing.by,
+                width: missing.size,
+                height: missing.size,
+                transformOrigin: `${missing.cx - missing.bx}px ${missing.cy - missing.by}px`,
+              }}
+            >
+              <div
+                className="zs-puzzle__bob absolute inset-0"
+                style={{ transformOrigin: `${missing.cx - missing.bx}px ${missing.cy - missing.by}px` }}
+              >
+                <div className="absolute inset-0" style={{ ...pieceStyle(missing), left: 0, top: 0 }} />
+                <svg
+                  aria-hidden="true"
+                  viewBox={`0 0 ${missing.size} ${missing.size}`}
+                  className="absolute inset-0 overflow-visible"
+                >
+                  <path d={missing.local} fill="none" stroke="var(--yellow)" strokeWidth={2.5} />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <figcaption className="label dot absolute left-0 top-full mt-8 text-muted">
+            Nedostaje još samo vaš dio
+          </figcaption>
         </figure>
       </Link>
     </section>

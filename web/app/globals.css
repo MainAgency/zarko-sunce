@@ -192,9 +192,15 @@ em.accent {
   opacity: 1;
   transform: none;
 }
+/* Hidden, the mask is clipped a hair past its own bottom edge and made invisible:
+   with fractional tile heights a clip that ends exactly on the edge leaves a 1px
+   sliver of the placeholder on screen before the photo reveals. */
 [data-reveal="image"] .reveal-mask {
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path 1.4s var(--ease-in-out);
+  clip-path: inset(calc(100% + 2px) 0 -2px 0);
+  visibility: hidden;
+  transition:
+    clip-path 1.4s var(--ease-in-out),
+    visibility 0s;
   transition-delay: var(--rd, 0ms);
 }
 [data-reveal="image"] .reveal-inner {
@@ -204,6 +210,7 @@ em.accent {
 }
 [data-reveal="image"][data-revealed] .reveal-mask {
   clip-path: inset(0 0 0 0);
+  visibility: visible;
 }
 [data-reveal="image"][data-revealed] .reveal-inner {
   transform: none;
@@ -278,20 +285,45 @@ em.accent {
   transform: translateY(-8px) rotate(45deg) scaleX(1);
 }
 
-/* Menu card (after fluid.glass): a dark panel under the header tiles. Each
-   text line sits in a mask and slides up into view when the menu opens, in
-   order from the top; the big links carry a second copy that rolls up on hover. */
+/* Menu card: unfolds downward from under the header tiles (a clip that opens
+   top to bottom, with a small drop), and folds back up faster on close. Only
+   clip-path, translate and opacity move, so it stays smooth over the blur.
+   Each text line sits in a mask and rises into view in order from the top;
+   the big links carry a second copy that rolls up on hover. */
+.zs-menu {
+  visibility: hidden;
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  translate: -50% -10px;
+  transition:
+    clip-path 0.4s var(--ease),
+    translate 0.4s var(--ease),
+    opacity 0.25s var(--ease) 0.1s,
+    visibility 0s linear 0.4s;
+}
+.zs-menu.is-open {
+  visibility: visible;
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  translate: -50% 0;
+  transition:
+    clip-path 0.75s var(--ease),
+    translate 0.75s var(--ease),
+    opacity 0.2s var(--ease),
+    visibility 0s;
+}
 .zs-menu__mask {
   overflow: hidden;
 }
 .zs-menu__line {
   display: block;
   transform: translateY(110%);
-  transition: transform 0.9s var(--ease);
-  transition-delay: var(--d, 0ms);
+  transition: transform 0.45s var(--ease);
 }
 .zs-menu.is-open .zs-menu__line {
   transform: none;
+  transition: transform 0.8s var(--ease);
+  transition-delay: var(--d, 0ms);
 }
 .zs-menu__link {
   position: relative;
@@ -435,14 +467,10 @@ em.accent {
 
 /* ---------- Closing call to action (puzzle) ---------- */
 
-/* Pieces are moved by script (scroll position); each rotates about its own
-   centre, given inline in board units. */
+/* Pieces are HTML layers moved by script (scroll position); each rotates
+   about its own centre, given inline in board units. */
 .zs-puzzle__piece,
-.zs-puzzle__missing,
-.zs-puzzle__bob {
-  transform-box: view-box;
-}
-.zs-puzzle__piece {
+.zs-puzzle__missing {
   will-change: transform, opacity;
 }
 
@@ -695,6 +723,62 @@ em.accent {
 [data-zs-portal] [data-gp-enter]:hover {
   background: var(--ink);
   color: var(--paper);
+}
+
+/* ---------- Novosti on touch (NewsPortalLite) ---------- */
+
+/* Everything here is transform/opacity on its own layer. The word is one SVG
+   text drawn 4× its shown size (--lite-base shrinks it back) and zoomed into
+   its target letter: --lite-s grows, --lite-x/y carry the target to the screen
+   centre and --lite-r is a slight roll. The veil then covers the ink. */
+.zs-lite__word {
+  fill: var(--news-letter);
+  transform: translate(var(--lite-x, 0px), var(--lite-y, 0px)) rotate(var(--lite-r, 0deg))
+    scale(calc(var(--lite-base, 0.25) * var(--lite-s, 1)));
+  will-change: transform;
+  pointer-events: none;
+}
+.zs-lite__caption {
+  opacity: var(--cap-o, 1);
+  will-change: opacity;
+}
+.zs-lite__veil {
+  opacity: var(--veil-o, 0);
+  will-change: opacity;
+  pointer-events: none;
+}
+.zs-lite__news {
+  z-index: 1;
+  /* Lands at the top of the screen exactly when the flight ends. */
+  margin-top: calc((var(--lite-len, 1.7) - 1) * 100svh);
+  opacity: var(--news-o, 0);
+  transform: translateY(var(--news-y, 40px));
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.zs-lite[data-entered] .zs-lite__news {
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .zs-lite__word,
+  .zs-lite__veil {
+    display: none;
+  }
+  .zs-lite__stage {
+    position: static;
+    height: auto;
+    padding-top: 7rem;
+  }
+  .zs-lite__caption {
+    position: static;
+    opacity: 1;
+  }
+  .zs-lite__news {
+    margin-top: 0;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
 }
 
 /* ---------- News portal background ---------- */

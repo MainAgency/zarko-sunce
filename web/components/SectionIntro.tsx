@@ -9,7 +9,7 @@ type SectionIntroProps = {
 export function SectionIntro({ title, text }: SectionIntroProps) {
   return (
     <div>
-      <h2 data-reveal className="heading max-w-4xl text-[clamp(1.875rem,3.4vw,3rem)]">
+      <h2 data-reveal className="heading max-w-4xl text-[clamp(2.25rem,4.2vw,3.75rem)]">
         {title}
       </h2>
       {text && (

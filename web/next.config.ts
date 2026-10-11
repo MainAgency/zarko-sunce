@@ -37,6 +37,11 @@ const { remotePatterns, bucketIsLocal } = (() => {
 const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";
 
 const nextConfig: NextConfig = {
+  // Dev only: let phones and tablets on the local network open the dev server
+  // (http://<laptop-ip>:3000). Without this Next.js blocks its scripts for any
+  // host but localhost, and the page stays blank because nothing hydrates.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.16.*.*", "*.local"],
+
   trailingSlash: true,
   compress: true,
   poweredByHeader: false,
