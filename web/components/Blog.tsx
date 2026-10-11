@@ -12,7 +12,6 @@ export function Blog() {
     <section id="blog" className="bg-paper py-28 lg:py-40">
       <div className="px-page">
         <SectionIntro
-          label="Blog"
           title={
             <>
               Savjeti i <em>inspiracija.</em>
@@ -46,6 +45,15 @@ export function Blog() {
           </li>
         ))}
       </ul>
+
+      <div className="px-page mt-12 lg:mt-16">
+        <Link
+          href="/blog"
+          className="label inline-flex h-12 items-center border border-ink px-6 transition-colors duration-300 hover:bg-ink hover:text-paper"
+        >
+          <span className="dot">Svi članci</span>
+        </Link>
+      </div>
     </section>
   );
 }

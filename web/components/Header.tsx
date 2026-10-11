@@ -23,6 +23,9 @@ const tile = "bg-tile/45 backdrop-blur-2xl backdrop-saturate-150 transform-gpu t
 
 const EASE = "ease-[cubic-bezier(0.22,1,0.36,1)]";
 
+/** Menu links: the contact page is left out — the quote button at the foot of the menu goes there. */
+const MENU = NAV.filter((n) => n.href !== "/kontakt");
+
 /** The small two-column block under the links: contact on the left, social icons on the right. */
 const CONTACTS = [
   { href: CONTACT.phoneHref, label: CONTACT.phone },
@@ -96,7 +99,7 @@ export function Header() {
   /** Stagger for the card's masked lines, top to bottom, after the card has unfolded. */
   const line = (i: number): CSSProperties => ({ "--d": open ? `${T.lineStart + i * 45}ms` : "0ms" }) as CSSProperties;
   // Lines reveal in order: title, links, the two small columns, then the button row.
-  const subStart = 1 + NAV.length;
+  const subStart = 1 + MENU.length;
   const buttonIndex = subStart + CONTACTS.length;
 
   return (
@@ -153,7 +156,7 @@ export function Header() {
           <nav
             id="izbornik"
             aria-label="Glavna navigacija"
-            className={`zs-menu absolute left-1/2 top-full mt-1 w-[min(calc(100vw-2rem),22.5rem)] origin-top -translate-x-1/2 bg-tile/70 p-[clamp(1.75rem,3.75vw,3.25rem)] text-foreground backdrop-blur-2xl backdrop-saturate-150 transition-[opacity,transform,visibility] ${EASE} ${
+            className={`zs-menu absolute left-1/2 top-full mt-1 w-[min(calc(100vw-2rem),26rem)] origin-top -translate-x-1/2 bg-tile/70 p-[clamp(1.75rem,3.75vw,3.25rem)] text-foreground backdrop-blur-2xl backdrop-saturate-150 transition-[opacity,transform,visibility] ${EASE} ${
               open ? "is-open visible scale-100 opacity-100" : "invisible scale-[0.96] opacity-0"
             }`}
             style={{
@@ -168,7 +171,7 @@ export function Header() {
             </p>
 
             <ul>
-              {NAV.map((item, i) => (
+              {MENU.map((item, i) => (
                 <li
                   key={item.href}
                   className={`zs-menu__item zs-menu__mask relative${isActive(item.href) ? " is-active" : ""}`}
@@ -186,7 +189,7 @@ export function Header() {
                       tabIndex={tab}
                       onClick={close}
                       aria-current={isActive(item.href) ? "page" : undefined}
-                      className="zs-menu__link w-fit text-[clamp(1.625rem,2vw,2rem)] font-light leading-[1.15] tracking-[-0.02em]"
+                      className="zs-menu__link w-fit text-[clamp(1.875rem,2.5vw,2.375rem)] font-light leading-[1.15] tracking-[-0.02em]"
                     >
                       <span className="zs-menu__roll">{item.label}</span>
                       <span className="zs-menu__roll" aria-hidden="true">

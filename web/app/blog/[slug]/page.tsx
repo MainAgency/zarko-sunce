@@ -36,7 +36,7 @@ export default async function BlogPostPage({ params }: Props) {
     <ArticleView
       article={post}
       section="Blog"
-      sectionHref="/#blog"
+      sectionHref="/blog"
       basePath="/blog"
       more={POSTS.filter((p) => p.slug !== slug).slice(0, 3)}
     />

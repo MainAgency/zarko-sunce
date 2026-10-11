@@ -19,7 +19,7 @@ const GLIDE = 0.1;
 /*
  * Services, after santalarch.com: a dark band that pins to the screen while
  * you scroll through it. The service names run sideways in one long row; a
- * window column lights up whichever name is passing through it (white over
+ * window column lights up whichever name is passing through it (full colour over
  * grey), and the service photos slide through the same window underneath, in
  * step. The description, the counter and the quote link follow the service
  * in the window.
@@ -82,7 +82,7 @@ export function Services() {
       id="usluge"
       ref={section}
       aria-label="Usluge"
-      className="relative bg-[#121212] text-white"
+      className="relative bg-background text-foreground"
       style={{ height: `${(N + 1) * 100}svh` }}
     >
       {/* Anchors for /#usluga-… links: each lands with its service in the window. */}
@@ -102,29 +102,26 @@ export function Services() {
         style={{ "--x": -1, "--intro": 0 } as CSSProperties}
       >
         {/* Column rails framing the window. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[var(--win)] w-px bg-white/10" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[var(--win)] w-px bg-line" />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-[calc(var(--win)+var(--col))] w-px bg-white/10"
+          className="pointer-events-none absolute inset-y-0 left-[calc(var(--win)+var(--col))] w-px bg-line"
         />
 
-        {/* Opening line: fades and lifts away as the first service arrives. */}
+        {/* Opening title, set on the window's left rail; fades and lifts away as the first service arrives. */}
         <div
-          className="px-page absolute inset-x-0 top-24 lg:top-28"
+          className="absolute left-[var(--win)] right-0 top-24 pl-5 lg:top-28 lg:pl-6"
           style={{ opacity: "calc(1 - var(--intro))", translate: "0 calc(var(--intro) * -3rem)" }}
         >
-          <p className="label dot text-white/60">Usluge</p>
-          <h2 className="heading mt-6 max-w-3xl text-[clamp(2.75rem,7.5vw,7rem)]">
-            Pet usluga, <em>jedna ekipa.</em>
-          </h2>
+          <h2 className="heading text-[clamp(2.75rem,7.5vw,7rem)]">Usluge</h2>
         </div>
 
-        {/* Service names: a grey row, and a white copy shown only inside the window. */}
+        {/* Service names: a faint row, and a full-colour copy shown only inside the window. */}
         {/* Anchored by their bottom edge, so two-line names still end just above the photo. */}
         <div aria-hidden="true" className="absolute inset-x-0 bottom-[76svh] md:bottom-[56svh]">
-          <TitleRow className="text-white/20" />
+          <TitleRow className="text-foreground/20" />
           <div className="zs-svc__lit absolute inset-0">
-            <TitleRow className="text-white" />
+            <TitleRow className="text-foreground" />
           </div>
         </div>
 
@@ -151,18 +148,20 @@ export function Services() {
           </div>
         </div>
 
-        {/* Text for the service in the window. */}
+        {/* Text for the service in the window — on phones it sits between the rails, centred. */}
         <div
-          className="px-page absolute inset-x-0 top-[70svh] md:right-auto md:top-[45svh] md:w-[calc(var(--win)-2rem)] md:max-w-md"
+          className="absolute left-[var(--win)] top-[70svh] w-[var(--col)] text-center px-page-md md:left-0 md:top-[45svh] md:w-[calc(var(--win)-2rem)] md:max-w-md md:text-left"
           style={{ opacity: "var(--intro)" }}
         >
           <div key={current.id} className="zs-svc__swap">
             <h3 className="sr-only">{current.title}</h3>
-            <p className="label text-white/50">{current.short}</p>
-            <p className="mt-4 max-w-sm text-white/75 md:text-lg md:leading-relaxed">{current.description}</p>
+            <p className="label text-muted">{current.short}</p>
+            <p className="mx-auto mt-4 max-w-sm text-foreground/75 md:mx-0 md:text-lg md:leading-relaxed">
+              {current.description}
+            </p>
             <Link
               href={`/kontakt?usluga=${current.id}`}
-              className="label mt-6 inline-flex h-12 items-center gap-3 bg-yellow px-6 text-black transition-colors duration-300 hover:bg-white"
+              className="label mt-6 inline-flex h-12 items-center gap-3 bg-yellow px-6 text-black transition-colors duration-300 hover:bg-ink hover:text-paper"
             >
               Zatražite ponudu <span aria-hidden="true">→</span>
             </Link>
@@ -171,12 +170,12 @@ export function Services() {
 
         {/* Counter and progress. */}
         <div
-          className="px-page label absolute inset-x-0 bottom-6 flex items-center justify-between gap-6 text-white/50"
+          className="label absolute bottom-6 left-[var(--win)] flex w-[var(--col)] items-center justify-center gap-6 text-muted px-page-md md:inset-x-0 md:w-auto md:justify-between"
           style={{ opacity: "var(--intro)" }}
         >
           <span className="hidden md:inline">Odaberite uslugu i pošaljite upit</span>
-          <span className="ml-auto flex items-center gap-4 tabular-nums">
-            <span className="text-white">{current.title}</span>
+          <span className="flex items-center gap-4 tabular-nums md:ml-auto">
+            <span className="text-foreground">{current.title}</span>
             <span>
               {pad(active + 1)} / {pad(N)}
             </span>
@@ -193,7 +192,7 @@ function TitleRow({ className }: { className: string }) {
       {ITEMS.map((s) => (
         <span
           key={s.id}
-          className="heading block w-[var(--col)] shrink-0 pr-6 text-[clamp(2.25rem,3.6vw,3.75rem)]"
+          className="heading block w-[var(--col)] shrink-0 px-3 text-center text-[clamp(2.25rem,3.6vw,3.75rem)] md:pl-0 md:pr-6 md:text-left"
         >
           {s.title}
         </span>

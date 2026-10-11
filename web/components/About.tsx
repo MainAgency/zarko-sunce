@@ -20,10 +20,7 @@ export function About() {
         </div>
 
         <div className="self-center lg:col-span-5 lg:col-start-8">
-          <p data-reveal className="label dot text-muted">
-            O nama
-          </p>
-          <h2 data-reveal style={{ "--rd": "80ms" } as CSSProperties} className="heading mt-6 text-[clamp(1.875rem,3.2vw,2.75rem)]">
+          <h2 data-reveal className="heading text-[clamp(1.875rem,3.2vw,2.75rem)]">
             Gradimo prostor u kojem se <em>dobro živi.</em>
           </h2>
           <div data-reveal style={{ "--rd": "160ms" } as CSSProperties} className="mt-8 space-y-4 text-muted">

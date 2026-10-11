@@ -4,8 +4,11 @@ import type { CSSProperties } from "react";
 
 import { formatDate, photoUrl, type Article } from "@/lib/content";
 
-/** News archive rows for a narrow column: date and category, title, excerpt — thumbnail on the right. */
-export function NewsList({ items }: { items: Article[] }) {
+/**
+ * Archive rows for the /novosti and /blog column — news or blog posts: date and category,
+ * title, excerpt, thumbnail on the right. `basePath` is the article route.
+ */
+export function NewsList({ items, basePath = "/novosti" }: { items: Article[]; basePath?: string }) {
   return (
     <ul className="border-t border-ink">
       {items.map((item, i) => (
@@ -16,8 +19,8 @@ export function NewsList({ items }: { items: Article[] }) {
           className="border-b border-line"
         >
           <Link
-            href={`/novosti/${item.slug}`}
-            className="group relative grid grid-cols-[1fr_6.5rem] items-center gap-5 py-6 sm:grid-cols-[1fr_9rem] sm:gap-8 sm:py-7"
+            href={`${basePath}/${item.slug}`}
+            className="group relative grid grid-cols-[1fr_7.5rem] items-center gap-5 py-7 sm:grid-cols-[1fr_13rem] sm:gap-10 sm:py-9 lg:grid-cols-[1fr_16rem]"
           >
             {/* Yellow marker that grows down the left edge on hover */}
             <span
@@ -29,22 +32,24 @@ export function NewsList({ items }: { items: Article[] }) {
               <p className="label text-muted">
                 <time dateTime={item.date}>{formatDate(item.date)}</time> · {item.category}
               </p>
-              <h2 className="heading mt-3 text-[clamp(1.25rem,1.8vw,1.625rem)]">
+              <h2 className="heading mt-3 text-[clamp(1.375rem,2.4vw,2.25rem)]">
                 <span className="link pb-1">{item.title}</span>
               </h2>
-              <p className="mt-2 line-clamp-2 text-sm text-muted">{item.excerpt}</p>
-              <span className="label mt-4 inline-flex items-center gap-3">
+              <p className="mt-3 line-clamp-2 max-w-xl text-muted sm:text-[17px]">{item.excerpt}</p>
+              <span className="label mt-5 inline-flex items-center gap-3">
                 Pročitaj
-                <span aria-hidden="true" className="transition-transform duration-500 group-hover:translate-x-1.5">→</span>
+                <span aria-hidden="true" className="transition-transform duration-500 group-hover:translate-x-1.5">
+                  →
+                </span>
               </span>
             </div>
 
-            <div className="relative aspect-[4/5] overflow-hidden bg-ink/5">
+            <div className="relative aspect-[4/3] overflow-hidden bg-ink/5 sm:aspect-[5/4]">
               <Image
-                src={photoUrl(item.cover, 400)}
+                src={photoUrl(item.cover, 700)}
                 alt={item.cover.alt}
                 fill
-                sizes="400px"
+                sizes="(min-width: 1024px) 256px, (min-width: 640px) 208px, 120px"
                 className="object-cover grayscale-[35%] transition-[transform,filter] duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 group-hover:grayscale-0"
               />
             </div>

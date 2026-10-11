@@ -15,6 +15,8 @@ type FrameProps = {
   preload?: boolean;
   /** Extra classes on the <img>, e.g. a hover zoom. */
   imgClassName?: string;
+  /** Extra inline style on the frame, e.g. an aspect ratio picked at run time. */
+  style?: CSSProperties;
 };
 
 /** A cropped photo in a square-cornered frame. Size it with `className` (aspect or height). */
@@ -26,11 +28,12 @@ export function Frame({
   delay = 0,
   preload = false,
   imgClassName = "",
+  style,
 }: FrameProps) {
   return (
     <div
       data-reveal={reveal ? "image" : undefined}
-      style={delay ? ({ "--rd": `${delay}ms` } as CSSProperties) : undefined}
+      style={delay ? ({ ...style, "--rd": `${delay}ms` } as CSSProperties) : style}
       className={`relative overflow-hidden ${className}`}
     >
       <div className="reveal-mask absolute inset-0 overflow-hidden bg-ink/5">

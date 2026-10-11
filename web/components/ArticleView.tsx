@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { formatDate, type Article } from "@/lib/content";
 
-import { CtaRow } from "./CtaRow";
 import { Frame } from "./Frame";
 
 type ArticleViewProps = {
@@ -61,7 +60,7 @@ export function ArticleView({ article, section, sectionHref, basePath, more }: A
 
       {more.length > 0 && (
         <section className="px-page border-t border-line bg-paper py-24">
-          <p className="label dot text-muted">Još iz rubrike {section}</p>
+          <h2 className="heading text-[clamp(1.75rem,3vw,2.5rem)]">Još iz rubrike {section}</h2>
           <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {more.map((item) => (
               <Link key={item.slug} href={`${basePath}/${item.slug}`} className="group block">
@@ -80,8 +79,6 @@ export function ArticleView({ article, section, sectionHref, basePath, more }: A
           </div>
         </section>
       )}
-
-      <CtaRow />
     </>
   );
 }

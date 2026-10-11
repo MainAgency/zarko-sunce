@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { NEWS, PHOTOS, photoUrl } from "@/lib/content";
+import { NEWS } from "@/lib/content";
 
 import { NewsMagazine } from "./NewsMagazine";
 import { SectionIntro } from "./SectionIntro";
@@ -50,7 +49,7 @@ export function NewsPortal() {
   if (!ready) {
     return (
       <section id="novosti" className="px-page py-28 lg:py-40">
-        <SectionIntro label="Novosti" title={<>Iz <em>radionice.</em></>} />
+        <SectionIntro title="Novosti" />
         <div className="mt-16">
           <NewsMagazine items={LATEST} />
         </div>
@@ -69,44 +68,50 @@ export function NewsPortal() {
         scrollLength={2.2}
         maxWordWidth={520}
         enterLabel="Uđite u novosti"
-        // The field stays near-black in both themes (its type is white), so it
-        // uses a fixed colour rather than --ink, which turns light in dark mode.
+        // Field and type follow the theme: a warm light field with dark type, or a
+        // near-black one with light type (--news-field / --foreground, globals.css).
         style={{
           "--gp-paper": "var(--background)",
           "--gp-ink": "var(--foreground)",
-          "--gp-field": "#121212",
-          "--gp-foreground": "#ffffff",
+          "--gp-field": "var(--news-field)",
+          "--gp-foreground": "var(--foreground)",
         }}
         background={
-          <div className="absolute inset-0" style={{ transform: "scale(var(--gp-field-scale,1))" }}>
-            <Image src={photoUrl(PHOTOS.hallSkylight, 2000)} alt="" fill sizes="100vw" className="object-cover" />
-            {/* Deepens to near-solid ink as the news fades in, so the cards' photos don't sit on another photo. */}
-            <div className="absolute inset-0 bg-[#121212]" style={{ opacity: "calc(0.6 + var(--gp-reveal, 0) * 0.34)" }} />
-          </div>
+          <>
+            {/* Seen through the letters at first, then all around the news: a plain
+                field with one soft drifting glow, a fine grid and a touch of grain. */}
+            <div
+              className="zs-news-bg absolute inset-0 overflow-hidden"
+              style={{ transform: "scale(var(--gp-field-scale,1))" }}
+            >
+              <div className="zs-news-bg__shade absolute inset-0" />
+              <div className="zs-news-bg__light absolute inset-0">
+                <span className="zs-news-bg__blob zs-news-bg__blob--a" />
+              </div>
+              <div className="zs-news-bg__grid absolute inset-0" />
+              <div className="zs-news-bg__grain absolute inset-0" />
+            </div>
+            <Blueprint />
+          </>
         }
         front={
           <>
-            <p data-zs-portal-label className="label">
-              <span className="dot">Novosti</span>
-            </p>
             <p data-zs-portal-support>Obavijesti i priče iz našeg rada.</p>
           </>
         }
       >
-        <div className="mx-auto w-full max-w-7xl">
+        {/* Drifts up into place as the news fades in. */}
+        <div className="zs-news-content mx-auto w-full max-w-7xl">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
-              <p className="label dot text-white/70">Novosti</p>
-              <h2 className="heading mt-5 text-[clamp(1.875rem,3.4vw,3rem)]">
-                Iz <em>radionice.</em>
-              </h2>
+              <h2 className="heading text-[clamp(1.875rem,3.4vw,3rem)]">Novosti</h2>
             </div>
-            <Link href="/novosti" className="label link pb-1 text-white/80">
+            <Link href="/novosti" className="label link pb-1">
               Sve novosti →
             </Link>
           </div>
           <div className="mt-12">
-            <NewsMagazine items={LATEST} dark />
+            <NewsMagazine items={LATEST} />
           </div>
         </div>
       </GlyphPortal>
@@ -114,9 +119,30 @@ export function NewsPortal() {
   );
 }
 
+/**
+ * A folding-rule ruler down the right edge of the news, drawn in from the top
+ * as the news come in — the one building-trade detail in the field.
+ */
+function Blueprint() {
+  return (
+    <div className="zs-blueprint pointer-events-none absolute inset-0" aria-hidden="true">
+      <span className="zs-blueprint__ruler">
+        {Array.from({ length: 16 }, (_, i) => (
+          <span key={i} className="zs-blueprint__ruler-num" style={{ top: `${i * 80}px` }}>
+            {i * 10}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
 function AllNewsLink() {
   return (
-    <Link href="/novosti" className="label mt-10 inline-flex h-12 items-center border border-ink px-6 transition-colors duration-300 hover:bg-ink hover:text-paper">
+    <Link
+      href="/novosti"
+      className="label mt-10 inline-flex h-12 items-center border border-ink px-6 transition-colors duration-300 hover:bg-ink hover:text-paper"
+    >
       <span className="dot">Sve novosti</span>
     </Link>
   );

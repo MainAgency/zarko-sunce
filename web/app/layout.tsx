@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Instrument_Serif } from "next/font/google";
+import { Archivo } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -21,14 +21,6 @@ const nohemi = localFont({
   variable: "--font-nohemi",
   display: "swap",
   adjustFontFallback: false,
-});
-
-const serif = Instrument_Serif({
-  subsets: ["latin", "latin-ext"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument-serif",
-  display: "swap",
 });
 
 // Only the logo and the Novosti portal use the heavy brand face.
@@ -57,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="hr"
       suppressHydrationWarning
-      className={`${nohemi.variable} ${serif.variable} ${display.variable} h-full antialiased`}
+      className={`${nohemi.variable} ${display.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

@@ -13,6 +13,10 @@
   --ink: #121212;
   /* Header tiles: a shade darker than the page so they read on it as well as on photos. */
   --tile: #e4e2da;
+  /* News portal: the field is the theme's own background; the letters of the
+     opening word show the contrasting colour before the field takes over. */
+  --news-field: var(--background);
+  --news-letter: #121212;
   /* shadcn token names, mapped onto this palette so copied components just work. */
   --border: var(--line);
   --muted-foreground: var(--muted);
@@ -32,6 +36,7 @@
   --line: rgb(243 242 238 / 0.14);
   --ink: #f3f2ee;
   --tile: #2c2c29;
+  --news-letter: #f3f2ee;
   color-scheme: dark;
 }
 
@@ -47,7 +52,6 @@
   --color-border: var(--border);
   --color-muted-foreground: var(--muted-foreground);
   --font-sans: var(--font-nohemi), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -105,6 +109,19 @@ textarea {
     padding-right: 3.5rem;
   }
 }
+/* The same gutter from tablet width up only (none on phones). */
+@media (min-width: 768px) {
+  .px-page-md {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .px-page-md {
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+}
 
 /* ---------- Type ---------- */
 
@@ -123,13 +140,11 @@ textarea {
   text-wrap: balance;
 }
 
-/* One serif-italic phrase per heading carries the "designed" voice. */
+/* Headings keep their <em> for meaning only: no script or italic face, the
+   phrase reads in the same type as the rest of the line. */
 .heading em,
 em.accent {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-style: normal;
 }
 
 /* Small yellow square — the logo's bar, reduced to a detail. */
@@ -307,6 +322,55 @@ em.accent {
 }
 .zs-menu__item .zs-menu__line {
   position: relative;
+}
+
+/* ---------- Projects grid ---------- */
+
+/* Columns drift with the scroll (--pl, px): the outer two on desktop, the
+   right one (a little less) on phones. */
+@media (min-width: 768px) {
+  .zs-drift {
+    translate: 0 calc(var(--pl, 0) * 1px);
+    will-change: translate;
+  }
+}
+@media (max-width: 767px) {
+  .zs-drift-sm {
+    translate: 0 calc(var(--pl, 0) * 0.7px);
+    will-change: translate;
+  }
+}
+
+/* ---------- Project gallery ---------- */
+
+/* Each tile rises by its column's speed times the distance scrolled (--gd). */
+.zs-gallery__item {
+  translate: 0 calc(var(--gd, 0) * var(--sp, 0) * -1px);
+  will-change: translate;
+}
+@media (min-width: 768px) {
+  .zs-gallery__item {
+    translate: 0 calc(var(--gd, 0) * var(--sd, 0) * -1px);
+  }
+}
+
+/* Full-screen viewer: fades in, each photo settles in as it changes. */
+.zs-lightbox {
+  animation: zs-fade 0.35s var(--ease) both;
+}
+.zs-lightbox__photo {
+  animation: zs-photo-in 0.5s var(--ease) both;
+}
+@keyframes zs-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes zs-photo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
 }
 
 /* ---------- Services (pinned scroller) ---------- */
@@ -593,6 +657,143 @@ em.accent {
 [data-zs-portal] [data-gp-enter]:hover {
   background: var(--ink);
   color: var(--paper);
+}
+
+/* ---------- News portal background ---------- */
+
+/* The theme's own background (light or dark) with one soft touch of
+   yellow in a corner. The letters of the opening word show --news-letter
+   (black on light, near-white on dark); as the news come in (--gp-reveal
+   0 → 1) the field turns to --news-field, the grid firms up and the
+   drawing-sheet marks are drawn. */
+.zs-news-bg,
+.zs-blueprint {
+  --nb-yellow: rgb(252 216 3 / 0.24);
+  --nb-blend: multiply;
+  --nb-grid: rgb(18 18 18 / 0.06);
+  --nb-line: rgb(18 18 18 / 0.45);
+  --nb-text: rgb(18 18 18 / 0.55);
+  --nb-grain: 0.05;
+}
+:root[data-theme="dark"] .zs-news-bg,
+:root[data-theme="dark"] .zs-blueprint {
+  --nb-yellow: rgb(252 216 3 / 0.17);
+  --nb-blend: screen;
+  --nb-grid: rgb(255 255 255 / 0.06);
+  --nb-line: rgb(255 255 255 / 0.4);
+  --nb-text: rgb(255 255 255 / 0.55);
+  --nb-grain: 0.1;
+}
+.zs-news-bg__shade {
+  background: color-mix(in srgb, var(--news-field) calc(var(--gp-reveal, 0) * 100%), var(--news-letter));
+}
+.zs-news-bg__light {
+  mix-blend-mode: var(--nb-blend);
+}
+.zs-news-bg__blob {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+/* One soft glow, drifting slowly in the upper corner. */
+.zs-news-bg__blob--a {
+  left: -12vmax;
+  top: -14vmax;
+  width: 52vmax;
+  height: 52vmax;
+  background: radial-gradient(closest-side, var(--nb-yellow), transparent);
+  animation: zs-drift-a 26s ease-in-out infinite alternate;
+}
+@keyframes zs-drift-a {
+  to {
+    transform: translate(10vw, 8vh) scale(1.1);
+  }
+}
+/* Architectural grid, fading out toward the edges, settling in as you enter. */
+.zs-news-bg__grid {
+  background-image:
+    linear-gradient(var(--nb-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nb-grid) 1px, transparent 1px);
+  background-size: 88px 88px;
+  background-position: center;
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  opacity: calc(0.6 + var(--gp-reveal, 0) * 0.4);
+  transform: scale(calc(1.08 - var(--gp-reveal, 0) * 0.08));
+}
+.zs-news-bg__grain {
+  opacity: var(--nb-grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The ruler layer: drawn in as the news come in. */
+.zs-blueprint {
+  --nb-inset: clamp(14px, 2.2vw, 32px);
+  opacity: var(--gp-reveal, 0);
+  color: var(--nb-text);
+}
+/* Ruler down the right edge, like a folding rule: a short tick every 8px,
+   a mid tick every 40px and a long, heavier tick every 80px with its number
+   to the left of it. Ticks grow inward from the edge. */
+.zs-blueprint__ruler {
+  position: absolute;
+  top: calc(var(--nb-inset) + 48px);
+  bottom: calc(var(--nb-inset) + 48px);
+  right: var(--nb-inset);
+  width: 56px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(to bottom, var(--nb-line) 0 2px, transparent 2px 80px) right / 34px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--nb-line) 0 1.5px, transparent 1.5px 40px) right / 22px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--nb-line) 0 1px, transparent 1px 8px) right / 12px 100% no-repeat;
+  border-right: 2px solid var(--nb-line);
+  clip-path: inset(0 0 calc((1 - var(--gp-reveal, 0)) * 100%) 0);
+}
+.zs-blueprint__ruler-num {
+  position: absolute;
+  right: 40px;
+  margin-top: -6px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 12px;
+  letter-spacing: 0.04em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.zs-blueprint__ruler-num:first-child {
+  margin-top: 0;
+}
+/* Narrower between phone and wide desktop, so it stays clear of the news column. */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .zs-blueprint__ruler {
+    width: 36px;
+    background-size: 20px 100%, 13px 100%, 7px 100%;
+  }
+  .zs-blueprint__ruler-num {
+    right: 24px;
+    font-size: 9px;
+  }
+}
+@media (max-width: 767px) {
+  /* Phones: ticks only, kept clear of the news column. */
+  .zs-blueprint__ruler {
+    width: 14px;
+    background-size: 14px 100%, 9px 100%, 5px 100%;
+  }
+  .zs-blueprint__ruler-num {
+    display: none;
+  }
+}
+/* The news themselves rise into place as they fade in. */
+.zs-news-content {
+  translate: 0 calc((1 - var(--gp-reveal, 1)) * 3rem);
+}
+@media (prefers-reduced-motion: reduce) {
+  .zs-news-bg__blob {
+    animation: none;
+  }
+  .zs-news-content {
+    translate: none;
+  }
 }
 
 /* ---------- Contact ---------- */

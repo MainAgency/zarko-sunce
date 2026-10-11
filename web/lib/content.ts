@@ -20,6 +20,7 @@ export const NAV = [
   { href: "/#usluge", label: "Usluge" },
   { href: "/#o-nama", label: "O nama" },
   { href: "/#projekti", label: "Projekti" },
+  { href: "/prije-i-poslije", label: "Prije ↔ poslije" },
   { href: "/#novosti", label: "Novosti" },
   { href: "/#blog", label: "Blog" },
   { href: "/kontakt", label: "Kontakt" },
@@ -78,7 +79,7 @@ export const PHOTOS = {
 export type HeroSlide = {
   label: string;
   title: string;
-  /** Second title line, set in the italic serif. */
+  /** Second title line. */
   accent: string;
   text: string;
   cta: { href: string; label: string };
