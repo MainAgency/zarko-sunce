@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+
 import { MediaImages } from './collections/MediaImages'
 import { MediaVideos } from './collections/MediaVideos'
 
