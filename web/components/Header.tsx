@@ -140,7 +140,7 @@ export function Header() {
               </span>
             </p>
 
-            <ul>
+            <ul className="space-y-2.5 sm:space-y-3">
               {MENU.map((item, i) => (
                 <li
                   key={item.href}

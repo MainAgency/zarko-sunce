@@ -6,8 +6,8 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { SERVICES, photoUrl, type ServiceId } from "@/lib/content";
 
-/** Display order: key-in-hand leads. */
-const ORDER: ServiceId[] = ["kljuc-u-ruke", "adaptacije", "knauf", "gletanje", "stropovi"];
+/** Display order: adaptations lead, key-in-hand before ceilings. */
+const ORDER: ServiceId[] = ["adaptacije", "knauf", "gletanje", "kljuc-u-ruke", "stropovi"];
 const ITEMS = ORDER.map((id) => SERVICES.find((s) => s.id === id)).filter((s) => s !== undefined);
 const N = ITEMS.length;
 

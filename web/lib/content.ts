@@ -72,6 +72,18 @@ export const PHOTOS = {
   bedroomLight: unsplash("1616486029423-aaa4789e8c9a", "Svijetla spavaća soba"),
   officeHall: unsplash("1739700712159-550519327ca7", "Hodnik poslovnog prostora"),
   homeOffice: unsplash("1613575831056-0acd5da8f085", "Radni kutak u dnevnom boravku"),
+  // Service photos: one per service, each showing the work itself.
+  renovationKitchen: {
+    src: "/images/usluge/adaptacije-stanova.webp",
+    alt: "Prije i poslije adaptacije: ogoljeni stan s otpalom žbukom i isti prostor kao dovršen dnevni boravak",
+  },
+  drywallPartition: {
+    src: "/images/usluge/pregradni-zidovi.webp",
+    alt: "Knauf pregradni zidovi od gips-kartonskih ploča na metalnoj potkonstrukciji, hodnik u stanu u izgradnji",
+  },
+  plasterTrowel: unsplash("1768839725085-829e6ac7ac26", "Majstor gleta zid špahtlom"),
+  ceilingCurved: unsplash("1582203423341-64b918240e25", "Bijeli spušteni strop s ugradbenom rasvjetom"),
+  livingFinished: unsplash("1741764014072-68953e93cd48", "Dovršen dnevni boravak s otvorenom kuhinjom"),
 };
 
 /* ------------------------------------------------------------- Services */
@@ -87,38 +99,38 @@ export type Service = {
 export const SERVICES: Service[] = [
   {
     id: "adaptacije",
-    photo: PHOTOS.livingWindow,
+    photo: PHOTOS.renovationKitchen,
     title: "Adaptacije stanova",
     short: "Nova raspodjela, novi život prostora",
     description: "Kompletne i djelomične adaptacije stanova i kuća, prilagođene vašem načinu života.",
   },
   {
     id: "knauf",
-    photo: PHOTOS.bedroomDark,
+    photo: PHOTOS.drywallPartition,
     title: "Pregradni zidovi",
     short: "Knauf suhomontažni sustavi",
     description: "Brza i čista podjela prostora bez mokrih radova, sa zvučnom i toplinskom izolacijom.",
   },
   {
     id: "gletanje",
-    photo: PHOTOS.shadowWall,
+    photo: PHOTOS.plasterTrowel,
     title: "Gletanje i bojanje",
     short: "Zidovi bez mane",
     description: "Precizna priprema podloge, gletanje u više slojeva i bojanje.",
   },
   {
-    id: "stropovi",
-    photo: PHOTOS.ceiling,
-    title: "Spušteni stropovi",
-    short: "Rasvjeta i skrivene instalacije",
-    description: "Ravni i kaskadni stropovi od gips-kartonskih ploča s mjestima za LED rasvjetu.",
-  },
-  {
     id: "kljuc-u-ruke",
-    photo: PHOTOS.kitchen,
+    photo: PHOTOS.livingFinished,
     title: "Ključ u ruke",
     short: "Jedan dogovor, cijeli projekt",
     description: "Planiranje, koordinacija radova, materijal i završno čišćenje — vi dobijete ključ.",
+  },
+  {
+    id: "stropovi",
+    photo: PHOTOS.ceilingCurved,
+    title: "Spušteni stropovi",
+    short: "Rasvjeta i skrivene instalacije",
+    description: "Ravni i kaskadni stropovi od gips-kartonskih ploča s mjestima za LED rasvjetu.",
   },
 ];
 
