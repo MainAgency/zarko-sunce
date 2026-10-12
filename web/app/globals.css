@@ -11,7 +11,6 @@
   --line: rgb(18 18 18 / 0.12);
   --yellow: #fcd803;
   --ink: #121212;
-  /* Header tiles: a shade darker than the page so they read on it as well as on photos. */
   --tile: #e4e2da;
   /* News portal: the field is the theme's own background; the letters of the
      opening word show the contrasting colour before the field takes over. */
@@ -160,7 +159,8 @@ em.accent {
 
 /* Underline that draws in on hover. */
 .link {
-  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0
+    1px;
   transition: background-size 0.6s var(--ease);
 }
 .link:hover,
@@ -360,7 +360,13 @@ em.accent {
 
 /* Two copies side by side, shifted by one copy: an endless glide. */
 .zs-partners {
-  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
 }
 .zs-partners__track {
   animation: zs-partners 24s linear infinite;
@@ -596,7 +602,11 @@ em.accent {
   }
 }
 .slide[data-enter="blinds"] {
-  mask-image: repeating-linear-gradient(90deg, #000 0 var(--hero-blind), transparent var(--hero-blind) 12.5%);
+  mask-image: repeating-linear-gradient(
+    90deg,
+    #000 0 var(--hero-blind),
+    transparent var(--hero-blind) 12.5%
+  );
 }
 
 /* The active photo settles slowly from a slight zoom. */
@@ -733,7 +743,8 @@ em.accent {
    centre and --lite-r is a slight roll. The veil then covers the ink. */
 .zs-lite__word {
   fill: var(--news-letter);
-  transform: translate(var(--lite-x, 0px), var(--lite-y, 0px)) rotate(var(--lite-r, 0deg))
+  transform: translate(var(--lite-x, 0px), var(--lite-y, 0px))
+    rotate(var(--lite-r, 0deg))
     scale(calc(var(--lite-base, 0.25) * var(--lite-s, 1)));
   will-change: transform;
   pointer-events: none;
@@ -787,7 +798,11 @@ em.accent {
    light, near-white on dark); as the news come in (--gp-reveal 0 → 1) it
    turns into --news-field, the page's own background. */
 .zs-news-bg {
-  background: color-mix(in srgb, var(--news-field) calc(var(--gp-reveal, 0) * 100%), var(--news-letter));
+  background: color-mix(
+    in srgb,
+    var(--news-field) calc(var(--gp-reveal, 0) * 100%),
+    var(--news-letter)
+  );
 }
 /* Static portal (reduced motion, a background tab, a late font): no fly-through,
    the word stays a poster above the news, so its letters keep the contrast colour. */
@@ -1163,7 +1178,8 @@ textarea.cm-field {
   justify-content: center;
   padding: 0.85em 1.6em;
   border: 1px solid var(--ink);
-  background: linear-gradient(90deg, transparent 50%, var(--ink) 50%) 100% 0 / 200% 100%;
+  background: linear-gradient(90deg, transparent 50%, var(--ink) 50%) 100% 0 /
+    200% 100%;
   color: var(--paper);
   font-size: var(--cm-field);
   font-weight: 500;
