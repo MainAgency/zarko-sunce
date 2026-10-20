@@ -489,5 +489,13 @@ export const POSTS: Article[] = [
   },
 ];
 
-export const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat("hr-HR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(new Date(iso));
+/**
+ * "01. 10. 2026." Built by hand rather than with Intl: hr-HR comes out as
+ * "01. 10. 2026." on the server (Node) but "01.10.2026." in Safari, and that
+ * text mismatch broke hydration on iOS (which in turn killed the splash).
+ */
+export const formatDate = (iso: string) => {
+  const date = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(date.getUTCDate())}. ${pad(date.getUTCMonth() + 1)}. ${date.getUTCFullYear()}.`;
+};

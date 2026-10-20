@@ -7,19 +7,23 @@ import { Logo } from "./Logo";
 const SPLASH_MS = 2200;
 
 /**
- * Opening screen on every page load: the wordmark fades in, its yellow bar
- * fills from left to right, then the whole thing fades away and the page is
- * there. It is server-rendered so it is on screen from the very first paint;
- * the inline script in layout.tsx marks <html data-splash="on"> before paint.
- * RevealObserver waits for the `splash:done` event so the scroll reveals
- * start once the page is visible.
+ * Opening screen on every page load, reloads included: the wordmark fades in,
+ * its yellow bar fills from left to right, then the whole thing fades away and
+ * the page is there. It is server-rendered so it is on screen from the very
+ * first paint; the inline script in layout.tsx marks <html data-splash="on">
+ * before paint. RevealObserver waits for the `splash:done` event so the scroll
+ * reveals start once the page is visible.
  */
 export function Splash() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
+    // The page stays put under the overlay. Touch is held off by touch-action
+    // in globals.css; this covers the mouse wheel and touchpads.
+    const block = (e: Event) => e.preventDefault();
     const finish = () => {
+      window.removeEventListener("wheel", block);
       delete root.dataset.splash;
       setDone(true);
       window.dispatchEvent(new Event("splash:done"));
@@ -32,8 +36,12 @@ export function Splash() {
       return;
     }
 
+    window.addEventListener("wheel", block, { passive: false });
     const timer = setTimeout(finish, SPLASH_MS);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("wheel", block);
+    };
   }, []);
 
   if (done) return null;

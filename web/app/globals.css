@@ -662,12 +662,16 @@ em.accent {
   transform: scale(1);
 }
 
+/* All captions share one grid cell, so the hidden ones lie on top of the active
+   one; without pointer-events: none they swallow taps on its link. */
 .caption {
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.5s var(--ease);
 }
 .caption[data-active="true"] {
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* Each caption line rises from a mask when its slide becomes active. */
@@ -1311,11 +1315,11 @@ textarea.cm-field {
   place-items: center;
   padding: 1.5rem;
   background: var(--background);
+  /* The page cannot be swiped out from under the overlay (Splash.tsx also
+     blocks the wheel). Not overflow: hidden on <html>, which makes
+     position: fixed drift on iOS Safari (see the note above the html rule). */
+  touch-action: none;
   animation: splash-out 0.5s var(--ease-in-out) 1.7s both;
-}
-/* The page cannot be scrolled out from under the overlay. */
-html[data-splash="on"] {
-  overflow: hidden;
 }
 .zs-splash__logo {
   animation: splash-in 0.6s var(--ease) both;

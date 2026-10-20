@@ -44,13 +44,17 @@ export const viewport: Viewport = {
 
 /** Runs before paint so a saved dark theme never flashes light. Default is light. */
 const themeScript = `try{if(localStorage.getItem("theme")==="dark"){document.documentElement.dataset.theme="dark"}}catch(e){}`;
-/** Marks the splash as running before paint, so the page cannot scroll out from under it. */
+/** Marks the splash as running before paint; Splash.tsx clears it and RevealObserver waits for that. */
 const splashScript = `document.documentElement.dataset.splash="on";`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // data-scroll-behavior: globals.css scrolls smoothly, and without this Next.js 16
+    // keeps that on for route changes too, so a new page opens where the old one was
+    // scrolled to (often its footer) and only then glides up to the top.
     <html
       lang="hr"
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${nohemi.variable} ${display.variable} h-full antialiased`}
     >
