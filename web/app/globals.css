@@ -132,10 +132,13 @@ textarea {
   text-transform: uppercase;
 }
 
+/* Headings and sub-headings are set in the logo face (Archivo Black); body
+   copy stays in Nohemi. */
 .heading {
-  font-weight: 300;
-  letter-spacing: -0.035em;
-  line-height: 1.04;
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
   text-wrap: balance;
 }
 
@@ -166,6 +169,47 @@ em.accent {
 .link:hover,
 .group:hover .link {
   background-size: 100% 1px;
+}
+
+/* Button that fills on hover: a colour sweeps in from the left behind the text.
+   --fill / --fill-text set the colour it fills with; the modifiers below pick
+   yellow or white. Works on the button itself or on a hovered .group around it. */
+.btn-fill {
+  --fill: var(--ink);
+  --fill-text: var(--paper);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    color 0.45s var(--ease),
+    border-color 0.45s var(--ease);
+}
+.btn-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--fill);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s var(--ease);
+}
+.btn-fill:hover,
+.group:hover .btn-fill {
+  color: var(--fill-text);
+  border-color: var(--fill);
+}
+.btn-fill:hover::before,
+.group:hover .btn-fill::before {
+  transform: scaleX(1);
+}
+.btn-fill--yellow {
+  --fill: var(--yellow);
+  --fill-text: #121212;
+}
+.btn-fill--white {
+  --fill: #fff;
+  --fill-text: #121212;
 }
 
 /* ---------- Reveal on scroll (driven by RevealObserver) ---------- */

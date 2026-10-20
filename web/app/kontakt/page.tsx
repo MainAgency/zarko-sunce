@@ -6,7 +6,7 @@ import { buildSeoMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildSeoMetadata({
   title: "Kontakt",
-  description: "Pošaljite upit za adaptaciju ili završne radove — dolazimo na besplatan izlazak na teren i šaljemo jasnu ponudu.",
+  description: "Pošaljite upit za adaptaciju ili završne radove u Splitu i okolici — dolazimo na besplatan izlazak na teren i šaljemo jasnu ponudu.",
   path: "/kontakt/",
 });
 

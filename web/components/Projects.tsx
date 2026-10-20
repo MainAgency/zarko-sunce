@@ -7,43 +7,29 @@ import { BeforeAfter } from "./BeforeAfter";
 import { ProjectsGrid } from "./ProjectsGrid";
 import { SectionIntro } from "./SectionIntro";
 
-/** The first before/after pair among the projects, shown as a wide slider under the selection. */
+/** The first before/after pair among the projects, shown as a wide slider above the selection. */
 const FEATURED_COMPARISON = PROJECTS.flatMap((p) => (p.comparisons ?? []).map((c) => ({ project: p, ...c })))[0];
 
 export function Projects() {
   return (
     <section aria-label="Projekti">
       <div id="projekti" className="px-page py-28 lg:py-40">
-        <SectionIntro
-          title={
-            <>
-              Odabrani <em>radovi.</em>
-            </>
-          }
-          text="Adaptacije i završni radovi — stanovi, kuće i poslovni prostori. Otvorite projekt za cijelu priču i fotografije."
-        />
-
-        {/* All projects, three drifting columns (see ProjectsGrid). */}
-        <div className="mt-16 lg:mt-24">
-          <ProjectsGrid projects={PROJECTS} />
-        </div>
-
-        {/* Before/after slider: drag the divider to compare the space before and after the work. */}
+        {/* Before/after slider first: drag the divider to compare the space before and after the work. */}
         {FEATURED_COMPARISON && (
-          <div className="mt-20 lg:mt-28">
+          <div>
             {/* Heading left, the link to every comparison top right (like the blog's "Svi članci"). */}
             <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
               <div className="grid gap-4 lg:grid-cols-12">
-                <h3 data-reveal className="heading text-[clamp(2rem,3.4vw,3rem)] lg:col-span-4">
+                <h2 data-reveal className="heading text-[clamp(2.25rem,4.2vw,3.75rem)] lg:col-span-5">
                   Prije ↔ poslije
-                </h3>
-                <p data-reveal className="max-w-md text-muted lg:col-span-7 lg:col-start-6 lg:pt-2">
+                </h2>
+                <p data-reveal className="max-w-md text-muted lg:col-span-6 lg:col-start-7 lg:pt-2">
                   Povucite crtu lijevo ili desno i usporedite prostor prije i nakon radova.
                 </p>
               </div>
               <Link
                 href="/prije-i-poslije"
-                className="label group inline-flex h-12 items-center gap-3 border border-ink px-6 transition-colors duration-300 hover:bg-ink hover:text-paper"
+                className="btn-fill label group inline-flex h-12 items-center gap-3 border border-ink px-6"
               >
                 Sve usporedbe prije ↔ poslije
                 <ArrowRight
@@ -73,6 +59,23 @@ export function Projects() {
             </div>
           </div>
         )}
+
+        {/* The selection, under the slider. */}
+        <div className={FEATURED_COMPARISON ? "mt-28 lg:mt-40" : ""}>
+          <SectionIntro
+            title={
+              <>
+                Odabrani <em>radovi.</em>
+              </>
+            }
+            text="Adaptacije i završni radovi — stanovi, kuće i poslovni prostori. Otvorite projekt za cijelu priču i fotografije."
+          />
+
+          {/* All projects, three drifting columns (see ProjectsGrid). */}
+          <div className="mt-16 lg:mt-24">
+            <ProjectsGrid projects={PROJECTS} />
+          </div>
+        </div>
       </div>
     </section>
   );

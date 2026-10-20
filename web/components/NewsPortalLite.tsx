@@ -15,6 +15,8 @@ const smooth = (a: number, b: number, n: number) => {
 };
 
 const WORD = "NOVOSTI";
+/** Same tracking as the site's headings (.heading in globals.css), in em. */
+const TRACKING = -0.045;
 /** Screens of scroll the flight through the letter takes. */
 const LENGTH = 1.7;
 /** The word is drawn this many times larger than shown, so it stays crisp into the zoom. */
@@ -63,8 +65,12 @@ export function NewsPortalLite({ items }: { items: Article[] }) {
       ready = false;
       if (reduce || !context) return;
       const font = getComputedStyle(textEl);
+      // Tracking goes on both the SVG text and the canvas; where the canvas can't, neither gets it.
+      const tracking = "letterSpacing" in context ? `${TRACKING * 100}px` : "0px";
+      textEl.style.letterSpacing = tracking;
       context.font = `${font.fontWeight} 100px ${font.fontFamily}`;
       context.fontKerning = "none";
+      context.letterSpacing = tracking;
       const metrics = context.measureText(WORD);
       const bounds = {
         x: -metrics.actualBoundingBoxLeft,

@@ -12,6 +12,12 @@ export default function Home() {
   const jsonLd = buildBusinessJsonLd({
     phone: CONTACT.phone,
     email: CONTACT.email,
+    address: {
+      addressLocality: "Split",
+      addressRegion: "Splitsko-dalmatinska županija",
+      addressCountry: "HR",
+    },
+    areaServed: ["Split", "Kaštela", "Solin", "Trogir", "Omiš"],
     logo: "/brand/zarko-sunce-logo.webp",
   });
 

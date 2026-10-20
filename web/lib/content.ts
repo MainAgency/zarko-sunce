@@ -3,15 +3,15 @@
  * then each export becomes a getter in `lib/api.ts`.
  */
 
-// TODO: replace the placeholder contact details with the real ones.
+// TODO: e-mail, social links and hours are still placeholders.
 export const CONTACT = {
-  phone: "+385 00 000 0000",
-  phoneHref: "tel:+38500000000",
-  whatsappHref: "https://wa.me/38500000000",
+  phone: "+385 99 6910 080",
+  phoneHref: "tel:+385996910080",
+  whatsappHref: "https://wa.me/385996910080",
   email: "info@zarko-sunce.hr",
   instagram: "https://www.instagram.com/zarkosunce",
   facebook: "https://www.facebook.com/zarkosunce",
-  area: "Grad i okolica",
+  area: "Split i okolica",
   hours: "Pon – Pet, 07:00 – 16:00",
 };
 
@@ -148,8 +148,10 @@ export const ABOUT = {
     alt: "Majstor Žarko Sunca montira profile za spušteni strop",
   } satisfies Photo,
   text: [
-    "Žarko Sunce d.o.o. bavi se adaptacijama stanova i završnim radovima — suhomontažom, gletanjem, bojanjem i spuštenim stropovima.",
+    "Žarko Sunce d.o.o. je građevinska firma iz Splita koja se bavi adaptacijama stanova i završnim radovima — suhomontažom, gletanjem, bojanjem i spuštenim stropovima.",
     "Radimo s jednom ekipom od početka do kraja. Rokovi se ne gube između različitih majstora, a vi imate jednu osobu za sve dogovore.",
+    "Radove izvodimo u Splitu i okolici — od Kaštela i Solina do Omiša i Trogira — u stanovima, kućama, poslovnim prostorima i novogradnji. Od manjih zahvata, poput pregradnog zida ili bojanja, do kompletnih uređenja po principu ključ u ruke.",
+    "Prije početka dolazimo na teren, snimimo postojeće stanje i dajemo jasnu ponudu bez skrivenih stavki. Materijal i rokove dogovaramo unaprijed, a gradilište ostavljamo uredno nakon svakog radnog dana.",
   ],
 };
 
@@ -235,9 +237,10 @@ export const PROJECTS: Project[] = [
     },
     "Restoran Soul Kitchen",
     [8, 21, 16, 4, 1, 22, 26, 27, 6, 10, 11, 18, 2, 3, 5, 7, 9, 12, 13, 14, 15, 17, 19, 20, 23, 24, 25, 28, 29],
+    // The first pair is the project's main comparison (home and the before/after page).
     [
-      [17, 16],
       [28, 4],
+      [17, 16],
       [19, 21],
       [12, 18],
     ],
@@ -367,12 +370,12 @@ export type Article = {
 export const NEWS: Article[] = [
   {
     slug: "nova-web-stranica",
-    title: "Pokrenuli smo novu web stranicu",
+    title: "test test test",
     date: "2026-10-01",
     category: "Obavijest",
     readingTime: "1 min",
     cover: PHOTOS.livingWindow,
-    excerpt: "Na jednom mjestu možete pogledati naše usluge, projekte i poslati upit za besplatnu procjenu.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Dobrodošli na novu web stranicu Žarko Sunca. Ovdje ćete pronaći sve naše usluge, odabrane projekte i savjete iz prakse." },
       { type: "p", text: "Upit za besplatnu procjenu možete poslati izravno preko obrasca na dnu stranice ili nas nazvati." },
@@ -380,12 +383,12 @@ export const NEWS: Article[] = [
   },
   {
     slug: "termini-za-izlazak-na-teren",
-    title: "Slobodni termini za izlazak na teren",
+    title: "test test test",
     date: "2026-09-15",
     category: "Obavijest",
     readingTime: "1 min",
     cover: PHOTOS.stair,
-    excerpt: "Planirate radove za zimu ili proljeće? Javite se na vrijeme i dogovorite besplatan izlazak na teren.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Najbolje je radove dogovoriti nekoliko tjedana unaprijed. Tako stignemo pogledati prostor, pripremiti ponudu i uskladiti termin." },
       { type: "p", text: "Pošaljite upit preko obrasca ili nas nazovite — javit ćemo vam se s prijedlogom termina." },
@@ -393,24 +396,24 @@ export const NEWS: Article[] = [
   },
   {
     slug: "zavrsen-projekt-dvosobni-stan",
-    title: "Završena adaptacija dvosobnog stana",
+    title: "test test test",
     date: "2026-08-28",
     category: "Projekt",
     readingTime: "2 min",
     cover: PHOTOS.studio,
-    excerpt: "Šest tjedana rada, pet usluga i jedan stan spreman za useljenje.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Predali smo još jedan stan po principu ključ u ruke. Cijeli projekt pogledajte u sekciji Projekti." },
     ],
   },
   {
     slug: "novi-alati-za-gletanje",
-    title: "Nova oprema za brže i čišće gletanje",
+    title: "test test test",
     date: "2026-07-10",
     category: "Oprema",
     readingTime: "2 min",
     cover: PHOTOS.vases,
-    excerpt: "Uz novu opremu za brušenje s usisom radilište ostaje znatno čišće.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Brušenje gleta je posao koji stvara najviše prašine. Uz brusilice s izravnim usisom prašina ostaje u spremniku, a ne na vašem namještaju." },
     ],
@@ -420,12 +423,12 @@ export const NEWS: Article[] = [
 export const POSTS: Article[] = [
   {
     slug: "knauf-ili-zidani-zid",
-    title: "Knauf ili zidani pregradni zid — što odabrati?",
+    title: "test test test",
     date: "2026-09-20",
     category: "Savjeti",
     readingTime: "4 min",
     cover: PHOTOS.homeOffice,
-    excerpt: "Usporedili smo suhomontažne i zidane pregradne zidove: brzinu, čistoću, izolaciju i cijenu.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Kad treba podijeliti prostor, najčešće se bira između zidanog zida i suhomontažnog (Knauf) sustava. Oba rješenja imaju svoje mjesto." },
       { type: "h2", text: "Brzina i čistoća" },
@@ -438,12 +441,12 @@ export const POSTS: Article[] = [
   },
   {
     slug: "kako-pripremiti-stan-za-gletanje",
-    title: "Kako pripremiti stan za gletanje i bojanje",
+    title: "test test test",
     date: "2026-09-02",
     category: "Vodič",
     readingTime: "3 min",
     cover: PHOTOS.shadowWall,
-    excerpt: "Pet koraka koje možete napraviti sami prije dolaska ekipe — i uštedjeti vrijeme.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Dobra priprema skraćuje radove i smanjuje nered. Evo što možete napraviti prije našeg dolaska." },
       { type: "h2", text: "Ispraznite zidove" },
@@ -456,12 +459,12 @@ export const POSTS: Article[] = [
   },
   {
     slug: "koliko-traje-adaptacija-stana",
-    title: "Koliko traje adaptacija stana?",
+    title: "test test test",
     date: "2026-08-14",
     category: "Savjeti",
     readingTime: "3 min",
     cover: PHOTOS.livingScandi,
-    excerpt: "Što sve utječe na trajanje radova i kako realno planirati useljenje.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Trajanje adaptacije ovisi o veličini stana, stanju prostora i opsegu radova. Djelomična adaptacija traje kraće od potpune." },
       { type: "h2", text: "Što najviše utječe na rok" },
@@ -472,12 +475,12 @@ export const POSTS: Article[] = [
   },
   {
     slug: "spusteni-strop-ideje",
-    title: "Spušteni strop: ideje za rasvjetu",
+    title: "test test test",
     date: "2026-07-22",
     category: "Inspiracija",
     readingTime: "2 min",
     cover: PHOTOS.ceiling,
-    excerpt: "LED trake, točkasta rasvjeta i kaskade — kako spušteni strop mijenja dojam prostora.",
+    excerpt: "test test test",
     body: [
       { type: "p", text: "Spušteni strop ne služi samo skrivanju instalacija. Uz dobro planiranu rasvjetu može potpuno promijeniti dojam prostora." },
       { type: "h2", text: "Indirektna LED rasvjeta" },

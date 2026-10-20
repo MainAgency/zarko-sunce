@@ -11,6 +11,8 @@ import { SectionIntro } from "./SectionIntro";
 import GlyphPortal from "./ui/glyph-portal";
 
 const FAMILY = '"Archivo", Arial, sans-serif';
+/** Same tracking as the site's headings (.heading in globals.css). */
+const TRACKING = -0.045;
 
 /** The home page shows only the latest few; the rest live on /novosti. */
 const LATEST = [...NEWS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
@@ -69,6 +71,7 @@ export function NewsPortal() {
         word="NOVOSTI"
         fontFamily={FAMILY}
         fontWeight={900}
+        letterSpacing={TRACKING}
         interactive={false}
         scrollLength={2.2}
         maxWordWidth={440}
@@ -117,7 +120,7 @@ function AllNewsLink() {
   return (
     <Link
       href="/novosti"
-      className="label mt-10 inline-flex h-12 items-center border border-ink px-6 transition-colors duration-300 hover:bg-ink hover:text-paper"
+      className="btn-fill label mt-10 inline-flex h-12 items-center border border-ink px-6"
     >
       <span className="dot">Sve novosti</span>
     </Link>

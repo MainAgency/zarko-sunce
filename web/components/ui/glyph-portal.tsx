@@ -29,6 +29,9 @@ export type GlyphPortalProps = {
   scrollLength?: number;
   fontFamily?: string;
   fontWeight?: number;
+  /** Tracking in em, like CSS letter-spacing (local addition). Applied only where the canvas
+   *  can measure it too, so the ink the camera flies through stays where it is drawn. */
+  letterSpacing?: number;
   annotations?: boolean;
   enterLabel?: string;
   className?: string;
@@ -90,7 +93,7 @@ function scrollParent(element: HTMLElement): HTMLElement | null {
 
 export default function GlyphPortal({
   word = "SUBLIME", focusChar, interactive = true, background, front, children, scrollLength = 2.4,
-  fontFamily = DEFAULT_FONT, fontWeight = 900, annotations = false,
+  fontFamily = DEFAULT_FONT, fontWeight = 900, letterSpacing = 0, annotations = false,
   enterLabel = "Enter section", className, style, onProgress, maxWordWidth = Infinity,
 }: GlyphPortalProps) {
   const uid = `gp-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
@@ -147,6 +150,9 @@ export default function GlyphPortal({
       catch { return false; }
     });
     glyph.style.fontFamily = [...available, DEFAULT_FONT].join(",");
+    // Tracking goes on both the SVG text and the canvas; where the canvas can't, neither gets it.
+    const tracking = context && "letterSpacing" in context && Number.isFinite(letterSpacing) ? `${letterSpacing * 100}px` : "0px";
+    glyph.style.letterSpacing = tracking;
     // A pending requested face may also hold WebKit's render loop. Keep that mount static.
     stalled = available.length < families.length;
 
@@ -156,6 +162,7 @@ export default function GlyphPortal({
       const scanFont = `${font.fontWeight} 300px ${font.fontFamily}`;
       context.font = `${font.fontWeight} 100px ${font.fontFamily}`;
       context.fontKerning = "none";
+      context.letterSpacing = tracking;
       const metrics = context.measureText(text);
       const advances = Array.from({ length: text.length }, (_, i) => context.measureText(text.slice(0, i)).width);
       // SVG getBBox includes the font's line box in some engines. Frame visible ink instead.
@@ -343,7 +350,7 @@ export default function GlyphPortal({
       choices.removeEventListener("keydown", navigate);
       picker.removeEventListener("change", pick);
     };
-  }, [text, focusChar, interactive, fontFamily, weight, length, clipId, hasFront, maxWordWidth]);
+  }, [text, focusChar, interactive, fontFamily, weight, letterSpacing, length, clipId, hasFront, maxWordWidth]);
 
   return (
     <section ref={sectionRef} id={uid} className={className} aria-label={text}
@@ -414,7 +421,7 @@ export default function GlyphPortal({
           {characters.map(({ char, index }, i) => <option key={index} value={index}>{i + 1} · {char}</option>)}
         </select></label>
         {front && <div data-gp-front>{front}</div>}
-        <span data-gp-fallback aria-hidden="true" style={{ fontFamily, fontWeight: weight }}>{text}</span>
+        <span data-gp-fallback aria-hidden="true" style={{ fontFamily, fontWeight: weight, letterSpacing: `${letterSpacing}em` }}>{text}</span>
         <div data-gp-caption>
           <span data-gp-hint aria-hidden="true">{interactive ? "Scroll to enter." : annotations ? "A passage through type" : ""}</span>
           <a data-gp-enter href={`#${uid}-content`}>{enterLabel}<span aria-hidden="true">↘</span></a>

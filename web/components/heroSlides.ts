@@ -1,4 +1,4 @@
-import { CONTACT, NEWS, PHOTOS, POSTS, PROJECTS, SERVICES, type Photo } from "@/lib/content";
+import { ABOUT, NEWS, PHOTOS, POSTS, PROJECTS, SERVICES, type Photo } from "@/lib/content";
 
 /** How a slide enters over the one before it (see .slide[data-enter] in globals.css). */
 export type HeroEnter = "wipe" | "circle" | "blinds" | "diagonal";
@@ -54,10 +54,10 @@ export const HERO_SLIDES: HeroSlide[] = [
     : []),
   {
     label: "O nama",
-    title: "Svaki detalj",
-    accent: "na svom mjestu",
-    text: "Jedna ekipa od početka do kraja — bez gubljenja rokova između različitih majstora.",
-    photo: PHOTOS.stair,
+    title: "Jedna ekipa,",
+    accent: "od početka do kraja",
+    text: "Rokovi se ne gube između različitih majstora, a vi imate jednu osobu za sve dogovore.",
+    photo: ABOUT.detail,
     cta: { href: "/#o-nama", label: "O nama" },
     enter: "diagonal",
   },
@@ -96,13 +96,4 @@ export const HERO_SLIDES: HeroSlide[] = [
         },
       ]
     : []),
-  {
-    label: "Kontakt",
-    title: "Radimo",
-    accent: "zajedno",
-    text: "Besplatan izlazak na teren i jasna ponuda, bez obveze.",
-    photo: PHOTOS.kitchen,
-    cta: { href: CONTACT.phoneHref, label: `Nazovite ${CONTACT.phone}` },
-    enter: "blinds",
-  },
 ];

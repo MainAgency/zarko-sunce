@@ -213,7 +213,7 @@ export function Header() {
                     href="/kontakt"
                     tabIndex={tab}
                     onClick={close}
-                    className="label flex h-11 flex-1 items-center justify-center gap-2.5 bg-ink text-[10px] text-paper transition-colors duration-300 hover:bg-yellow hover:text-black"
+                    className="btn-fill btn-fill--yellow label flex h-11 flex-1 items-center justify-center gap-2.5 bg-ink text-[10px] text-paper"
                   >
                     <CornerDownRight aria-hidden="true" strokeWidth={1.5} className="size-3.5" />
                     Zatražite ponudu

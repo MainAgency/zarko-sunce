@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useLayoutEffect, useRef, type CSSProperties } from "react";
 
-import { PHOTOS, photoUrl } from "@/lib/content";
+import { CONTACT, PHOTOS, photoUrl } from "@/lib/content";
 
 /*
  * Closing call to action, reworked from the 21st.dev "Let's work together"
@@ -212,7 +212,7 @@ export function LetsWorkTogether() {
   const missing = PIECES[MISSING];
 
   return (
-    <section aria-labelledby="radimo-zajedno" className="overflow-hidden border-t border-line">
+    <section aria-labelledby="iz-ideje-u-stvarnost" className="overflow-hidden border-t border-line">
       <Link
         href="/kontakt"
         className="group px-page grid items-center gap-16 py-28 outline-offset-[-6px] focus-visible:outline-2 focus-visible:outline-yellow lg:grid-cols-12 lg:gap-10 lg:py-40"
@@ -226,23 +226,33 @@ export function LetsWorkTogether() {
             </span>
             Primamo nove projekte
           </p>
-          <h2 id="radimo-zajedno" data-reveal style={delay(80)} className="heading mt-8 text-[clamp(3rem,7vw,6.5rem)]">
-            Radimo <em>zajedno.</em>
+          <h2 id="iz-ideje-u-stvarnost" data-reveal style={delay(80)} className="heading mt-8 text-[clamp(2.75rem,5.8vw,5.5rem)]">
+            Iz ideje <em>u stvarnost.</em>
           </h2>
           <p data-reveal style={delay(160)} className="mt-8 max-w-sm text-lg leading-relaxed text-muted">
-            Vaš prostor slažemo dio po dio — od prvog mjerenja do zadnjeg sloja boje. Nedostaje još samo vaš upit.
+            Recite nam što planirate. Dolazimo na besplatan izlazak na teren, pogledamo prostor i šaljemo
+            jasnu ponudu — bez skrivenih stavki i bez obveze.
           </p>
-          <span
-            data-reveal
-            style={delay(220)}
-            className="label mt-10 inline-flex h-14 items-center gap-3 bg-ink px-7 text-paper transition-colors duration-300 group-hover:bg-yellow group-hover:text-black"
-          >
-            Pošaljite upit
-            <ArrowUpRight
-              aria-hidden="true"
-              strokeWidth={1.75}
-              className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
+          {/* Button: text block plus an arrow cell; on hover the arrow slides out and a
+              second one slides in behind it, while the whole button turns yellow. */}
+          <span data-reveal style={delay(220)} className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+            <span className="btn-fill btn-fill--yellow inline-flex h-14 items-stretch bg-ink text-paper">
+              <span className="flex items-center pl-7 pr-6 text-[15px] font-medium tracking-[-0.01em]">Pošaljite upit</span>
+              <span
+                aria-hidden="true"
+                className="relative flex w-14 items-center justify-center overflow-hidden border-l border-paper/15 transition-colors duration-300 group-hover:border-black/15"
+              >
+                <ArrowUpRight
+                  strokeWidth={1.75}
+                  className="size-5 transition-transform duration-500 ease-out group-hover:-translate-y-8 group-hover:translate-x-8"
+                />
+                <ArrowUpRight
+                  strokeWidth={1.75}
+                  className="absolute size-5 -translate-x-8 translate-y-8 transition-transform duration-500 ease-out group-hover:translate-x-0 group-hover:translate-y-0"
+                />
+              </span>
+            </span>
+            <span className="text-sm text-muted">ili nazovite {CONTACT.phone}</span>
           </span>
         </div>
 
@@ -326,9 +336,6 @@ export function LetsWorkTogether() {
               </div>
             </div>
           </div>
-          <figcaption className="label dot absolute left-0 top-full mt-8 text-muted">
-            Nedostaje još samo vaš dio
-          </figcaption>
         </figure>
       </Link>
     </section>

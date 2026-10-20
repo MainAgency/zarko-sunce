@@ -102,7 +102,7 @@ function Tile({ project, index, phone = false }: { project: Project; index: numb
         style={{ aspectRatio: (phone ? ASPECTS_PHONE : ASPECTS)[index % ASPECTS.length] }}
       />
       {/* Just the project's name under the photo. */}
-      <span className={`block leading-tight ${phone ? "mt-2 text-[15px]" : "mt-3 text-base sm:text-lg"}`}>
+      <span className={`block leading-tight ${phone ? "mt-2 text-base" : "mt-4 text-lg sm:text-xl"}`}>
         <span className="link pb-0.5">{project.title}</span>
         {!phone && " →"}
       </span>

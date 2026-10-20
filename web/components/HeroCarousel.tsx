@@ -141,8 +141,8 @@ export function HeroCarousel() {
                 className={`heading ${
                   // Long lines (a news headline) step down a size so they stay within a few lines.
                   slide.title.length + slide.accent.length > 34
-                    ? "text-[clamp(2.25rem,4.8vw,4.75rem)]"
-                    : "text-[clamp(2.75rem,7vw,6.75rem)]"
+                    ? "text-[clamp(2.25rem,4.2vw,4.25rem)]"
+                    : "text-[clamp(2.75rem,6vw,5.75rem)]"
                 }`}
               >
                 <span className="caption-line">
@@ -160,7 +160,7 @@ export function HeroCarousel() {
                   <a
                     href={slide.cta.href}
                     tabIndex={i === index ? 0 : -1}
-                    className="group/cta label inline-flex h-12 items-center gap-3 border border-white/50 px-6 transition-colors duration-300 hover:border-white hover:bg-white hover:text-black"
+                    className="btn-fill btn-fill--white group/cta label inline-flex h-12 items-center gap-3 border border-white/50 px-6"
                   >
                     {slide.cta.label}
                     <ArrowRight

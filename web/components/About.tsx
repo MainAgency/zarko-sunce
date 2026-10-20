@@ -25,7 +25,7 @@ export function About() {
         <div className="flex min-w-0 flex-col lg:col-span-5 lg:col-start-8 lg:justify-between lg:py-[8%]">
           <div>
             <h2 data-reveal className="heading text-[clamp(2.25rem,4vw,3.5rem)]">
-              Svaki detalj <em>na svom mjestu.</em>
+              Uredno, precizno, <em>na vrijeme.</em>
             </h2>
             <div data-reveal style={{ "--rd": "160ms" } as CSSProperties} className="mt-8 space-y-4 text-muted">
               {ABOUT.text.map((p) => (

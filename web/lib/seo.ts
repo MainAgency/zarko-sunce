@@ -8,7 +8,7 @@ export const SITE_URL =
 export const SITE_NAME = "Žarko Sunce";
 
 export const DEFAULT_DESCRIPTION =
-  "Adaptacije stanova, Knauf pregradni zidovi, gletanje i bojanje, spušteni stropovi i radovi po principu ključ u ruke. Besplatan izlazak na teren i jasna ponuda.";
+  "Žarko Sunce d.o.o. iz Splita: adaptacije stanova, Knauf pregradni zidovi, gletanje i bojanje, spušteni stropovi i radovi po principu ključ u ruke u Splitu i okolici. Besplatan izlazak na teren i jasna ponuda.";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || "http://localhost:3001";
 
@@ -91,7 +91,7 @@ export const seoRootDefaults: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
   title: {
-    default: SITE_NAME,
+    default: `${SITE_NAME} — Adaptacije stanova i završni radovi, Split`,
     template: `%s | ${SITE_NAME}`,
   },
   description: DEFAULT_DESCRIPTION,
@@ -119,10 +119,12 @@ export type BusinessContact = {
     closes: string;
   }[];
   logo?: string;
+  /** Places the business serves, e.g. ["Split", "Kaštela"]. */
+  areaServed?: string[];
 };
 
 export function buildBusinessJsonLd(contact: BusinessContact = {}) {
-  const { phone, email, address, openingHours, logo } = contact;
+  const { phone, email, address, openingHours, logo, areaServed } = contact;
 
   const postalAddress = address
     ? {
@@ -143,6 +145,9 @@ export function buildBusinessJsonLd(contact: BusinessContact = {}) {
         ...(phone ? { telephone: phone } : {}),
         ...(email ? { email } : {}),
         ...(postalAddress ? { address: postalAddress } : {}),
+        ...(areaServed?.length
+          ? { areaServed: areaServed.map((name) => ({ "@type": "City", name })) }
+          : {}),
         ...(logo ? { image: absolute(logo, SITE_URL) } : {}),
         ...(openingHours?.length
           ? {

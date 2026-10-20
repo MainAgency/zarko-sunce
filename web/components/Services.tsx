@@ -176,7 +176,7 @@ export function Services() {
             </p>
             <Link
               href={`/kontakt?usluga=${current.id}`}
-              className="label mt-6 inline-flex h-12 items-center gap-3 bg-yellow px-6 text-black transition-colors duration-300 hover:bg-ink hover:text-paper"
+              className="btn-fill label mt-6 inline-flex h-12 items-center gap-3 bg-yellow px-6 text-black"
             >
               Zatražite ponudu <span aria-hidden="true">→</span>
             </Link>
@@ -188,7 +188,6 @@ export function Services() {
           className="label absolute bottom-6 left-[var(--win)] flex w-[var(--col)] items-center justify-center gap-6 text-muted px-page-md md:inset-x-0 md:w-auto md:justify-between"
           style={{ opacity: "var(--intro)" }}
         >
-          <span className="hidden md:inline">Odaberite uslugu i pošaljite upit</span>
           <span className="flex items-center gap-4 tabular-nums md:ml-auto">
             <span className="text-foreground">{current.title}</span>
             <span>

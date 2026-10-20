@@ -86,14 +86,17 @@ export function MinimalFooter() {
         {/* Extra room at the bottom on phones so the floating corner button doesn't cover the line. */}
         <div className="label flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-line px-6 pb-16 pt-5 text-muted sm:pb-5 md:px-10">
           <span>© {year} Žarko Sunce d.o.o.</span>
-          <a
-            href="https://www.main.hr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link transition-colors duration-300 hover:text-foreground"
-          >
-            Main
-          </a>
+          <span>
+            Design by{" "}
+            <a
+              href="https://www.main.hr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link transition-colors duration-300 hover:text-foreground"
+            >
+              MAIN
+            </a>
+          </span>
         </div>
       </div>
     </footer>
