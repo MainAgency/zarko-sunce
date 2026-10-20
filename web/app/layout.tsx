@@ -6,6 +6,7 @@ import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { RevealObserver } from "@/components/RevealObserver";
+import { Splash } from "@/components/Splash";
 import { seoRootDefaults } from "@/lib/seo";
 
 // Nohemi (Fontshare) is the site face. Only these three cuts are bundled, so
@@ -43,6 +44,8 @@ export const viewport: Viewport = {
 
 /** Runs before paint so a saved dark theme never flashes light. Default is light. */
 const themeScript = `try{if(localStorage.getItem("theme")==="dark"){document.documentElement.dataset.theme="dark"}}catch(e){}`;
+/** Marks the splash as running before paint, so the page cannot scroll out from under it. */
+const splashScript = `document.documentElement.dataset.splash="on";`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -52,12 +55,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${nohemi.variable} ${display.variable} h-full antialiased`}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeScript + splashScript }} />
       </head>
       <body className="min-h-full flex flex-col">
         <noscript>
-          <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-reveal] .reveal-mask{clip-path:none!important}[data-reveal] .reveal-inner{transform:none!important}`}</style>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-reveal] .reveal-mask{clip-path:none!important}[data-reveal] .reveal-inner{transform:none!important}.zs-splash{display:none}`}</style>
         </noscript>
+        <Splash />
         <Header />
         {/* Clips sideways overflow (marquees, reveals) without touching <html>/<body>,
             so the fixed header keeps the viewport as its containing block on iOS. */}

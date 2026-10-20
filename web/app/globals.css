@@ -1254,3 +1254,53 @@ textarea.cm-field {
     transform: none;
   }
 }
+
+/* ---------- Splash screen ---------- */
+
+/* Timeline (Splash.tsx unmounts at 2.2s): the wordmark rises in, the yellow
+   bar draws from left to right, the overlay fades and the page is there. */
+.zs-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: var(--background);
+  animation: splash-out 0.5s var(--ease-in-out) 1.7s both;
+}
+/* The page cannot be scrolled out from under the overlay. */
+html[data-splash="on"] {
+  overflow: hidden;
+}
+.zs-splash__logo {
+  animation: splash-in 0.6s var(--ease) both;
+}
+.zs-splash__bar {
+  transform-origin: left;
+  animation: splash-bar 1.2s var(--ease-in-out) 0.45s both;
+}
+@keyframes splash-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes splash-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes splash-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
