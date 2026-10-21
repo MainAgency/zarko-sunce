@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { ABOUT } from "@/lib/content";
+
 import { Frame } from "./Frame";
 import { PartnersMarquee } from "./PartnersMarquee";
 
